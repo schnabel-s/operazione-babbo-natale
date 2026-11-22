@@ -1,0 +1,626 @@
+<!doctype html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Operazione Babbo Natale</title>
+<style>
+@font-face{font-family:"Special Elite";src:url(fonts/special-elite-latin-400-normal.woff2) format("woff2");font-weight:400;font-display:swap}
+@font-face{font-family:Inter;src:url(fonts/inter-latin-400-normal.woff2) format("woff2");font-weight:400;font-display:swap}
+@font-face{font-family:Inter;src:url(fonts/inter-latin-600-normal.woff2) format("woff2");font-weight:600;font-display:swap}
+@font-face{font-family:Inter;src:url(fonts/inter-latin-700-normal.woff2) format("woff2");font-weight:700;font-display:swap}
+:root{color-scheme:dark;--bg:#0f2a22;--panel:#1b3a30;--line:#3f6a58;--gold:#f2c14e;--red:#d8434a;--ink:#f6f1e4;--mute:#b6cbc0;--ok:#7fe0a0;--bad:#ff9a90;--paper:#ead4a4;--pt:#3b2a14;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*{box-sizing:border-box}
+body{margin:0;background:radial-gradient(circle at 50% -10%,#1f5240,var(--bg) 60%);color:var(--ink);font-family:Inter,system-ui,sans-serif;font-size:18px;line-height:1.5;min-height:100vh}
+main{max-width:1140px;margin:0 auto;padding:16px 20px 90px;position:relative;z-index:2}
+.lights{height:14px;margin:0 -20px 10px;background:repeating-linear-gradient(90deg,var(--red) 0 12px,transparent 12px 36px,#3fbf73 36px 48px,transparent 48px 72px,var(--gold) 72px 84px,transparent 84px 108px);border-radius:0 0 8px 8px;opacity:.9}
+h1{font-family:"Special Elite",Georgia,serif;font-size:36px;margin:4px 0;color:var(--gold)}
+.tag{font-size:12px;letter-spacing:.16em;text-transform:uppercase;color:var(--mute)}
+.bar{height:10px;background:var(--line);border-radius:5px;margin:12px 0 18px}
+.bar div{height:10px;background:linear-gradient(90deg,var(--red),var(--gold));border-radius:5px;transition:width .3s}
+.grid{display:grid;grid-template-columns:repeat(4,1fr);gap:22px 16px;margin-top:22px}
+.door{position:relative;min-height:96px;border:0;border-radius:4px 10px 10px 10px;background:var(--paper);color:var(--pt);font:700 30px "Special Elite",Georgia,serif;cursor:pointer;box-shadow:0 3px 0 #b99a62}
+.door::before{content:"";position:absolute;top:-11px;left:0;width:42%;height:13px;background:inherit;border-radius:7px 7px 0 0}
+.door small{display:block;font:600 10px Inter,sans-serif;letter-spacing:.2em;color:#6b5330}
+.door.open{box-shadow:0 0 0 3px var(--gold),0 0 18px rgba(242,193,78,.6)}
+.door.open::after{content:"";position:absolute;right:12px;top:0;width:12px;height:36px;background:var(--red)}
+.door.done{background:#b9d3bf;color:#1d3b2a}
+.door.done::after{content:"RISOLTO";position:absolute;right:6px;bottom:8px;font:700 11px Inter,sans-serif;color:var(--red);border:2px solid var(--red);padding:1px 5px;transform:rotate(-8deg);border-radius:4px}
+.door:disabled small{color:#c9dad1}
+.door:disabled{background:#35574a;color:#b6cbc0;cursor:default;box-shadow:none}
+.card{background:var(--panel);border-radius:12px;padding:18px 20px;margin-top:18px;border:1px solid var(--line)}
+button.opt,button.btn{min-height:48px;padding:10px 18px;border-radius:10px;border:2px solid var(--gold);background:transparent;color:var(--gold);font:600 17px Inter,sans-serif;cursor:pointer;margin:4px 8px 4px 0}
+button.opt.ok{background:var(--ok);border-color:var(--ok);color:#0b2a14}
+button.opt.bad{border-color:var(--bad);color:var(--bad)}
+button.btn.solid{background:var(--gold);color:#241a08}
+input.ans{min-height:48px;font:600 18px Inter,sans-serif;padding:8px 12px;border-radius:10px;border:2px solid var(--line);background:#0f2a22;color:var(--ink);width:200px;margin-right:8px}
+.row{display:flex;gap:12px;align-items:center;justify-content:space-between;flex-wrap:wrap}
+.help{border-left:4px solid var(--gold);padding:8px 14px;margin-top:12px;background:#12291f;border-radius:6px}
+.clue{border:2px dashed var(--gold);border-radius:10px;padding:12px 16px;margin-top:12px;background:#12291f}
+.note{background:#f4eed8;color:#3b2a14;font-family:"Special Elite",Georgia,serif;padding:16px 20px;border-radius:3px;transform:rotate(-1.5deg);box-shadow:0 4px 10px rgba(0,0,0,.4);margin:14px 6px}
+.figs{display:flex;gap:14px;flex-wrap:wrap;margin:12px 0}
+.figs figure{margin:0;flex:1;min-width:150px;background:#12291f;border-radius:10px;padding:10px;text-align:center;font-size:15px}
+.photo{margin:10px 0;position:relative}
+.photo img{display:block;width:100%;height:auto;border-radius:8px;background:#12291f}
+.photo figcaption{font-size:12px;color:var(--mute);margin-top:4px}
+.photo .ts{position:absolute;right:12px;bottom:34px;font:400 clamp(14px,3.4vw,24px)/1 "Special Elite",monospace;color:#ffb347;text-shadow:0 1px 3px #000,0 0 6px #000}
+.msg{min-height:26px;margin-top:8px;font-weight:600}
+.seq{min-height:48px;padding:8px;border:2px dashed var(--line);border-radius:8px;margin:8px 0}
+.small{font-size:14px;color:var(--mute)}
+.w{border-bottom:2px dotted var(--gold);cursor:help}
+#tip{position:fixed;left:50%;bottom:calc(16px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--gold);color:#241a08;font-weight:700;padding:12px 20px;border-radius:12px;z-index:20;box-shadow:0 6px 18px rgba(0,0,0,.5)}
+#snow{position:fixed;inset:0;pointer-events:none;z-index:1;overflow:hidden}
+#snow i{position:absolute;top:-10px;width:6px;height:6px;border-radius:50%;background:#fff;opacity:.7;animation:fall linear infinite}
+@keyframes fall{to{transform:translateY(105vh)}}
+.zettel{position:relative;background:#fff3a8;color:#3b2a14;font-family:"Special Elite",Georgia,serif;font-size:17px;padding:16px 18px 14px;border-radius:2px;transform:rotate(-1.2deg);box-shadow:0 4px 10px rgba(0,0,0,.45);margin:14px 4px 4px;max-width:520px}
+.zettel .tag{color:#7a5a1a}
+.zettel .pin{position:absolute;top:-8px;left:50%;width:14px;height:14px;border-radius:50%;background:var(--red);box-shadow:0 2px 3px rgba(0,0,0,.4)}
+.rvh{border:2px solid var(--red);border-radius:10px;padding:10px 14px;margin:10px 0;background:#2a1d1d}
+.layout{display:grid;grid-template-columns:1fr 250px;gap:24px;align-items:start}
+#susp{position:sticky;top:12px;display:flex;flex-direction:column;gap:18px;padding-top:18px}
+#susp .tag{margin-bottom:-4px}
+.sn{position:relative;background:#fff3a8;color:#3b2a14;border-radius:2px;padding:14px 14px 12px;box-shadow:0 4px 10px rgba(0,0,0,.45);font-family:"Special Elite",Georgia,serif;min-height:88px;display:flex;gap:12px;align-items:center}
+.sn:nth-child(odd){transform:rotate(-1.5deg)}.sn:nth-child(even){transform:rotate(1.2deg)}
+.sn .pin{position:absolute;top:-8px;left:50%;width:14px;height:14px;border-radius:50%;background:var(--red);box-shadow:0 2px 3px rgba(0,0,0,.4)}
+.sn .q{font-size:44px;line-height:1;color:#7a5a1a;width:64px;flex:none;text-align:center}
+.sn svg{flex:none}
+.sn b{display:block;font-size:18px}
+.sn span.r{font:400 13px Inter,sans-serif;color:#4a3a1f}
+button.sn{border:0;width:100%;text-align:left;cursor:pointer;font-size:16px}
+.sn.ex::after{content:"ESCLUSO/A";position:absolute;right:6px;bottom:6px;font:700 12px Inter,sans-serif;color:#9e1f27;border:2px solid #9e1f27;padding:1px 5px;transform:rotate(-10deg);border-radius:4px;background:rgba(255,243,168,.85)}
+.win{border:3px solid var(--gold);text-align:center}
+.stamp{display:inline-block;font:400 clamp(38px,9vw,84px)/1.05 "Special Elite",Georgia,serif;color:#ff8a80;border:6px solid #ff8a80;border-radius:10px;padding:8px 26px;transform:rotate(-5deg);margin:14px 0 10px;letter-spacing:.04em}
+@media (prefers-reduced-motion:no-preference){.stamp{animation:stampin .5s ease-out}}
+@keyframes stampin{from{transform:rotate(-5deg) scale(2.2);opacity:0}to{transform:rotate(-5deg) scale(1);opacity:1}}
+.bigwin{text-align:center;padding:10px 4px 6px}
+.cand{display:flex;align-items:center;gap:12px;width:100%;max-width:520px;text-align:left}
+.cand svg{flex:none}
+.win h2{font-family:"Special Elite",Georgia,serif;color:var(--gold);margin:4px 0}
+@media (max-width:860px){.layout{grid-template-columns:1fr}#susp{position:static;flex-direction:row;flex-wrap:wrap}.sn{flex:1 1 220px}}
+.dot{display:inline-block;width:14px;height:14px;border-radius:50%;margin-right:8px;vertical-align:-2px}
+.pt{display:flex;justify-content:space-between;gap:10px;padding:6px 0;border-bottom:1px solid var(--line);font-size:16px;color:var(--ink)}
+@media (prefers-reduced-motion:reduce){#snow{display:none}}
+@media (max-width:640px){.grid{grid-template-columns:repeat(3,1fr)}h1{font-size:28px}}
+</style>
+</head>
+<body>
+<div id="snow" aria-hidden="true"></div>
+<main>
+<div class="lights" aria-hidden="true"></div>
+<div class="row"><div><div class="tag">Caso n. 24 · Dossier segreto</div><h1>Operazione Babbo Natale</h1></div>
+<div><button class="btn" id="mus">♪ Musica</button><span class="small">Aiuti usati: <span id="hc">0</span></span></div></div>
+<div class="bar"><div id="pb" style="width:0%"></div></div>
+<div id="student">
+<div class="layout"><div>
+<div id="home">
+<div class="small" id="todayInfo"></div>
+<div class="card" id="intro"></div>
+<div class="card win" id="win" hidden></div>
+<div class="grid" id="grid"></div>
+<div class="card"><div class="tag">Il mio dossier</div><div id="clues" class="small"></div></div>
+<div class="card"><div class="tag">Il mio punto della situazione</div><div id="punto" class="small"></div></div>
+</div>
+<div id="task" hidden></div>
+<div class="card small" id="testcard" hidden><label><input type="checkbox" id="tm"> Modalità prova (solo insegnante)</label>
+<span id="tmsel" hidden> · Giorno: <select id="td" aria-label="Giorno di prova"></select></span>
+ · <button class="btn" id="rst" style="min-height:44px;padding:4px 12px;font-size:14px">Fortschritt dieses Geräts löschen</button></div>
+</div>
+<aside id="susp" aria-label="Notizzettel dei sospettati"></aside></div>
+</div>
+</main>
+<div id="tip" hidden role="status"></div>
+<audio id="au" loop preload="none" src="musica/tu-scendi.mp3"></audio>
+<script>
+// ===== Einstellungen =====
+// Freischaltung: Ab dem jeweiligen Unterrichtstag sind alle Türchen bis zur angegebenen Nummer bearbeitbar.
+// ["Datum", höchste Türchen-Nummer]. Außerdem öffnet jedes Türchen am eigenen Kalendertag.
+var RELEASE = [["2026-12-03",6],["2026-12-07",9],["2026-12-10",13],["2026-12-14",16],["2026-12-17",20],["2026-12-21",23]];
+// Einzelne Türchen erst ab einem Datum öffnen (Finale gemeinsam am letzten Schultag):
+var UNLOCK = {24:"2026-12-22"};
+// Reihenfolge: Ein Türchen öffnet erst, wenn das vorherige gelöst ist (im Prüfmodus egal).
+// ===== Wörterbuch (Antippen im Text) =====
+var G = {"enigma":"Rätsel","enigmi":"Rätsel","colpevole":"Täter/-in","sparito":"verschwunden","raccogli":"sammle","testimone":"Zeuge/Zeugin","ladro":"Dieb","ladra":"Diebin","indizio":"Hinweis, Spur","indizi":"Hinweise","dossier":"Akte","biglietto":"Zettel","messaggio":"Nachricht","slitta":"Schlitten","renna":"Rentier","sacco":"Sack","tavolo":"Tisch","triste":"traurig","trovare":"finden","trovi":"du findest","detective":"Detektiv","cerca":"sucht","scontrino":"Kassenbon","resto":"Rückgeld","tasca":"Tasche","paga":"bezahlt","descrive":"beschreibt","porta":"trägt / Tür","mercatino":"Weihnachtsmarkt","torno":"ich komme zurück","presto":"bald","esco":"ich gehe aus","esce":"geht aus","vado":"ich gehe","vuota":"leer","vicino":"in der Nähe","taglia":"Größe","cerco":"ich suche","aiutarla":"Ihnen helfen","tutto":"alles","apri":"öffne","risolvi":"löse","porte":"Türen","guarda":"schaut","comprato":"gekauft","compra":"kauft","negozio":"Geschäft","pagato":"bezahlt","costa":"kostet","asino":"Esel","commesso":"Verkäufer","commessa":"Verkäuferin","cliente":"Kunde/Kundin","fascicolo":"Akte, Ordner","obiettivo":"Ziel","salva":"rette","salvare":"retten","cari":"liebe (m.)","care":"liebe (f.)","bambini":"Kinder (m.)","bambine":"Kinder (f.)","preferisco":"ich bevorzuge","lunga":"lang","larga":"weit","corta":"kurz","piccola":"klein","grande":"groß","nasconde":"versteckt","sfilata":"Modenschau","passerella":"Laufsteg","stilista":"Modedesigner/-in","pasticciere":"Konditor","pasticceria":"Konditorei","fotografo":"Fotograf","sveglia":"wacht auf","sveglio":"ich wache auf","alza":"steht auf","alzo":"ich stehe auf","veste":"zieht sich an","vesto":"ich ziehe mich an","sera":"Abend","notte":"Nacht","alibi":"Alibi","sospettati":"Verdächtige","indossa":"trägt (Kleidung)","indossano":"tragen (Kleidung)","modella":"Model (f.)","modello":"Model (m.)","modelli":"Models","giardino":"Garten","botanico":"botanisch","controlla":"prüfe","difficili":"schwierige","subito":"sofort","fretta":"Eile","passeggiata":"Spaziergang","verifica":"Klassenarbeit","regola":"Regel","riaperto":"wieder geöffnet","contrario":"Gegenteil","persona":"Person","sospetta":"verdächtig","sospettato":"Verdächtiger","sospettata":"Verdächtige","vecchia":"alte","signora":"Dame, Frau","regali":"Geschenke","conosciuta":"bekannt","ancora":"noch","escludi":"schließe aus","tocca":"tippe an","scegli":"wähle","provano":"beweisen","rileggi":"lies nochmal","corretto":"richtig","finale":"letzte(r)","domanda":"Frage","aspetta":"warte","secondi":"Sekunden","libero":"frei","insegnante":"Lehrer/-in","schermo":"Bildschirm","mostra":"zeige","alberi":"Bäume","alcune":"einige","alto":"hoch","amico":"Freund","amica":"Freundin","aspettano":"warten auf","backstage":"hinter der Bühne","bancarella":"Marktstand","bancone":"Theke","bicchiere":"Glas","biscotti":"Kekse","borsa":"Tasche","borse":"Taschen","carbone":"Kohle","caramelle":"Bonbons","cenone":"großes Festessen","chiamami":"ruf mich an","cifre":"Ziffern","clienti":"Kunden","confermano":"bestätigen","confronta":"vergleiche","dolce":"süß","dolci":"Süßigkeiten","dopo":"nach","famiglia":"Familie","famiglie":"Familien","fanno":"machen","fazzoletto":"Tuch","festa":"Fest","feste":"Feste","fieno":"Heu","firmato":"unterschrieben","foglio":"Blatt","freddo":"kalt","giusto":"gerecht, richtig","gonna":"Rock","guanti":"Handschuhe","guardiano":"Wächter","guardiana":"Wächterin","inizia":"beginnt","finisce":"endet","lascia":"lässt / hinterlässt","lasciare":"verlassen","lasciate":"lasst","latte":"Milch","lavoro":"Arbeit","letto":"Bett","lista":"Liste","liste":"Listen","marroni":"braun","mattina":"Morgen","metto":"ich ziehe an / lege","moderno":"modern","motivo":"Grund","nascondere":"verstecken","nessuno":"niemand","neve":"Schnee","ogni":"jeder / jede","anno":"Jahr","quest’anno":"dieses Jahr","pagina":"Seite","quaderno":"Heft","panettone":"italienischer Weihnachtskuchen","panettoni":"Weihnachtskuchen","perso":"verloren","pesce":"Fisch","poco":"wenig","polizia":"Polizei","poliziotto":"Polizist","poliziotta":"Polizistin","pranzo":"Mittagessen","profuma":"duftet","proverbio":"Sprichwort","qualcuno":"jemand","racconta":"erzählt","rapire":"entführen","rapporto":"Bericht","rotte":"kaputt","scontrini":"Kassenbons","scopa":"Besen","scopri":"finde heraus","seguito":"gefolgt","semplificato":"vereinfacht","sempre":"immer","spesso":"oft","stasera":"heute Abend","tante":"viele","tardi":"spät","testo":"Text","tombola":"Bingo-Spiel","torrone":"Nougat","torroni":"Nougat","tracce":"Spuren","trova":"findet","vanno":"gehen","vecchi":"alte","vecchie":"alte","vecchio":"alt","vende":"verkauft","vendita":"Verkauf","venditore":"Verkäufer","venditrice":"Verkäuferin","vigilia":"Heiligabend","visto":"gesehen","vocale":"Vokal","volare":"fliegen","vuole":"will","pensa":"denkt","pensano":"denken","più":"mehr / am meisten","strano":"seltsam","oggetto":"Gegenstand","lavarsi":"sich waschen","vestirsi":"sich anziehen","alzarsi":"aufstehen","svegliarsi":"aufwachen","speciale":"besonders","importante":"wichtig","nord":"Norden","cappotto":"Mantel","pantaloni":"Hose","incontra":"trifft","mette":"legt / steckt","epifania":"Dreikönigstag (6. Januar)","scrive":"schreibt","detto":"gesagt","venduto":"verkauft","trovato":"gefunden","passato":"Vergangenheit"};
+var KEYS=Object.keys(G).sort(function(a,b){return b.length-a.length});
+var RX=new RegExp("(^|[^A-Za-zÀ-ÿ])("+KEYS.join("|")+")(?![A-Za-zÀ-ÿ])","gi");
+function gl(s){return s.replace(RX,function(m,p,w){return p+'<span class="w" tabindex="0" role="button" data-t="'+G[w.toLowerCase()]+'">'+w+'</span>';});}
+// ===== Aufgaben =====
+// Pro Frage: t=mc|type|order, q, o (Optionen), a (richtig), h (Mini-Hinweis je Option), h1 (allg. Mini-Hinweis),
+// r (Regel nach dem 2. Fehler), k (Thema), v (Variante für die Wiederholung "Caso riaperto")
+var RULE_COL="Colori in -o: rosso · rossa · rossi · rosse. Colori in -e: verde · verdi. Invariabili: blu, rosa, viola, beige.";
+var RULE_Q="quello (m. sg.) · quella (f. sg.) · quelli (m. pl.) · quelle (f. pl.). Scegli come il nome: la giacca → quella.";
+var RULE_P="lo (m. sg.) · la (f. sg.) · li (m. pl.) · le (f. pl.). Il pronome sta davanti al verbo: la compra.";
+var RULE_R="svegliarsi: mi sveglio · ti svegli · si sveglia · ci svegliamo · vi svegliate · si svegliano. Il pronome (mi, ti, si …) sta davanti al verbo.";
+var D = {
+1:{title:"Il biglietto",story:"È la sera del 30 novembre. Babbo Natale non è più a casa sua. La slitta è vuota e la renna è triste. Sul tavolo c’è un biglietto. Sei un detective o una detective: devi trovare il colpevole o la colpevole. Leggi il messaggio con attenzione.",scene:1,
+ note:"Cari bambini e care bambine,<br>stasera, il 30 novembre, esco alle nove e mezza con la mia renna. Vado al mercatino e compro una sciarpa verde. Torno presto!<br><b>Babbo Natale</b>",
+ qs:[{t:"mc",k:"comprensione",q:"Babbo Natale scrive: «Vado con il mio asino.» Vero o falso?",o:["Vero","Falso"],a:1,h:["Leggi di nuovo il biglietto: con quale animale esce?",""],h1:"Leggi di nuovo il biglietto.",r:"Nel biglietto: «con la mia renna». Una renna non è un asino."},
+     {t:"mc",k:"l’ora",q:"A che ora esce Babbo Natale?",o:["Alle 9:30 di mattina","Alle 21:30","Alle 20:30"],a:1,h:["Il biglietto dice «stasera» (heute Abend).","","«nove e mezza»: che cosa significa «mezza»?"],h1:"Leggi: «alle nove e mezza».",r:"mezza = :30. Di sera: 9 → 21. Nove e mezza di sera = 21:30.",
+       v:{q:"Marco chiude il negozio alle dieci e mezza di sera. Che ora è?",o:["22:30","10:30 di mattina","21:30"],a:0}},
+     {t:"mc",k:"comprensione",q:"Che cosa compra al mercatino?",o:["Una giacca rossa","Un cappello blu","Una sciarpa verde"],a:2,h:["Nel biglietto: «una sciarpa verde».","Nel biglietto: «una sciarpa verde».",""],h1:"Cerca la parola «compro» nel biglietto.",r:"Nel biglietto: «compro una sciarpa verde»."},
+     {t:"type",k:"i numeri",q:"Scrivi il numero in lettere: il 30 novembre = il ______ novembre.",a:["trenta"],h1:"20 = venti, 40 = quaranta. E 30?",r:"30 = trenta · 31 = trentuno · 40 = quaranta.",
+       v:{q:"Scrivi il numero in lettere: 40 euro = ______ euro.",a:["quaranta"]}}],
+ clue:"Il 30 novembre alle 21:30 Babbo Natale va al mercatino. Compra una sciarpa verde.",
+ help:["mezza = :30 · un quarto = :15 · meno un quarto = :45 (Halb = :30, Viertel nach = :15, Viertel vor = :45)","20 = venti · 30 = trenta · 40 = quaranta"]},
+2:{title:"La giacca rossa",story:"Un testimone / Una testimone descrive il ladro / la ladra. Completa la descrizione.",
+ qs:[{t:"mc",k:"i colori",q:"Il ladro / La ladra porta una giacca ___.",o:["rosso","rossa","rossi"],a:1,h:["Giacca è femminile: la giacca. Come cambia -o?","","Rossi è plurale. Una giacca è singolare."],h1:"Giacca è femminile singolare.",r:RULE_COL,
+       v:{q:"Chiara porta una gonna ___.",o:["bianco","bianca","bianche"],a:1}},
+     {t:"mc",k:"i colori",q:"Porta pantaloni ___.",o:["blu","blue","blui"],a:0,h:["","«Blue» non esiste in italiano. Il colore è «blu».","Blu è invariabile: non ha il plurale."],h1:"Blu: è un colore speciale.",r:RULE_COL,
+       v:{q:"Ha due borse ___.",o:["viola","viole","violi"],a:0}},
+     {t:"mc",k:"i colori",q:"Ha anche scarpe ___.",o:["nero","nera","nere"],a:2,h:["Scarpe è plurale e femminile. Nero è maschile singolare.","Nera è singolare. Le scarpe sono più di una.",""],h1:"Scarpe è femminile plurale.",r:RULE_COL,
+       v:{q:"Ha due sciarpe ___.",o:["gialli","gialle","giallo"],a:1}},
+     {t:"mc",k:"i colori",q:"E una sciarpa ___.",o:["verde","verda","verdi"],a:0,h:["","«Verda» non esiste. I colori in -e hanno una sola forma al singolare.","Verdi è plurale. Una sciarpa è singolare."],h1:"Verde: colore in -e.",r:RULE_COL,
+       v:{q:"Ha tre cappelli ___.",o:["verde","verdi","verda"],a:1}}],
+ clue:"Il ladro / La ladra porta una giacca rossa, pantaloni blu, scarpe nere e una sciarpa verde.",
+ help:["I colori in -o cambiano: rosso, rossa, rossi, rosse. I colori in -e cambiano solo al plurale: verde → verdi. Blu non cambia.","giacca = femminile singolare · scarpe = femminile plurale"]},
+3:{title:"Il testimone / La testimone",story:"Un testimone / Una testimone guarda la foto del ladro / della ladra e risponde alle tue domande.",photo:{src:"fotos/d03-zeuge.jpg",alt:"Una persona vista da dietro in una strada di Milano"},
+ qs:[{t:"mc",k:"quello",q:"Quale giacca? — ___ rossa!",o:["Quella","Quelle","Quello"],a:0,h:["","Quelle è plurale. Una giacca è singolare.","Quello è maschile. La giacca è femminile."],h1:"La giacca è femminile singolare.",r:RULE_Q,
+       v:{q:"Quale gonna? — ___ nera!",o:["Quello","Quella","Quelle"],a:1}},
+     {t:"mc",k:"quello",q:"Quali scarpe? — ___ nere!",o:["Quella","Quelle","Quello"],a:1,h:["Quella è singolare. Le scarpe sono plurale.","","Quello è maschile singolare."],h1:"Le scarpe: femminile plurale.",r:RULE_Q,
+       v:{q:"Quali borse? — ___ gialle!",o:["Quelle","Quelli","Quella"],a:0}},
+     {t:"mc",k:"quello",q:"Quale cappello? — ___ blu!",o:["Quelli","Quella","Quello"],a:2,h:["Quelli è plurale. Un solo cappello: singolare.","Quella è femminile. Il cappello è maschile.",""],h1:"Il cappello: maschile singolare.",r:RULE_Q,
+       v:{q:"Quali pantaloni? — ___ grigi!",o:["Quello","Quelli","Quelle"],a:1}}],
+ clue:"Il testimone / La testimone vede un cappello blu e una giacca rossa.",
+ help:["quello = maschile singolare · quella = femminile singolare · quelli = maschile plurale · quelle = femminile plurale","Esempio: Quale libro? — Quello rosso!"]},
+4:{title:"In boutique",story:"Il ladro / La ladra ha comprato una giacca in una boutique. Metti il dialogo in ordine, poi completa le frasi.",
+ qs:[{t:"order",k:"dialogo",lines:["Buongiorno! Posso aiutarla?","Cerco una giacca rossa.","Ecco. Che taglia porta?","La 44. La provo!","Costa 49 euro.","Va bene, la prendo!"],h1:"Prima si saluta, poi si cerca il vestito.",r:"Ordine: saluto → cerco → taglia → provo → prezzo → compro."},
+     {t:"mc",k:"lo/la/li/le",q:"Il ladro / La ladra vede la giacca. → ___ compra.",o:["lo","la","li"],a:1,h:["Lo = maschile singolare. La giacca è femminile.","","Li = maschile plurale."],h1:"Giacca: femminile singolare.",r:RULE_P,
+       v:{q:"Vede il cappello. → ___ compra.",o:["La","Lo","Le"],a:1}},
+     {t:"mc",k:"lo/la/li/le",q:"Vuole anche i guanti. → ___ prende.",o:["Le","Lo","Li"],a:2,h:["Le = femminile plurale. I guanti sono maschili.","Lo è singolare. I guanti sono plurale.",""],h1:"I guanti: maschile plurale.",r:RULE_P,
+       v:{q:"Vede le scarpe nere. → ___ prova.",o:["Li","Le","La"],a:1}},
+     {t:"type",k:"lo/la/li/le",q:"Il commesso / La commessa vende la sciarpa. → ___ vende. (una parola)",a:["la"],h1:"Sciarpa è femminile singolare. Quale pronome? (lo / la / li / le)",r:RULE_P,
+       v:{q:"Il commesso / La commessa vende i pantaloni. → ___ vende. (una parola)",a:["li"]}}],
+ clue:"Un cliente / Una cliente ha comprato una giacca rossa, taglia 44, nel negozio «Moda Duomo».",
+ help:["lo = maschile singolare · la = femminile singolare · li = maschile plurale · le = femminile plurale. Il pronome sta davanti al verbo.","la giacca → la provo, la prendo"]},
+5:{title:"Lo scontrino",story:"Nella tasca del ladro / della ladra c’è uno scontrino: una sciarpa 18 €, un cappello 12 € e dei guanti 9 €.",
+ qs:[{t:"type",k:"i numeri",q:"Quanto costa tutto? Scrivi solo il numero.",a:["39"],h1:"Prima: 18 + 12 = 30. Poi + 9.",r:"18 + 12 + 9 = 39",
+       v:{q:"Una gonna 27 €, una maglietta 15 €. Quanto costa tutto? Scrivi solo il numero.",a:["42"]}},
+     {t:"type",k:"i numeri",q:"Il ladro / La ladra paga con 50 euro. Quanto è il resto? Scrivi solo il numero.",a:["11"],h1:"Resto = 50 − totale (39).",r:"50 − 39 = 11",
+       v:{q:"Paghi con 50 euro. Il totale è 42 euro. Quanto è il resto? Scrivi solo il numero.",a:["8"]}},
+     {t:"mc",k:"lo/la/li/le",q:"Il ladro / La ladra vede una sciarpa verde. → ___ compra.",o:["La","Lo","Li"],a:0,h:["","Lo è maschile. La sciarpa è femminile.","Li è plurale. Una sciarpa è singolare."],h1:"Sciarpa: femminile singolare.",r:RULE_P,
+       v:{q:"Vede due maglie rosse. → ___ compra.",o:["Le","Li","La"],a:0}}],
+ clue:"Lo scontrino è di 39 euro. Il ladro / La ladra ha pagato con 50 euro.",
+ help:["18 + 12 + 9 = ? · 50 − (Totale) = ?","il resto = das Wechselgeld"]},
+6:{title:"Il Duomo",story:"Lo scontrino viene dal negozio «Moda Duomo». Dove si trova?",photo:{src:"fotos/d06-duomo.jpg",alt:"La facciata del Duomo di Milano e la piazza"},
+ qs:[{t:"mc",k:"Milano",q:"In quale città c’è il Duomo con la piazza famosa?",o:["Roma","Venezia","Milano"],a:2,h:["","",""],h1:"Il negozio si chiama «Moda Duomo». Dove c’è il Duomo con la piazza famosa?",r:"Il Duomo di Milano è nella Piazza Duomo, al centro della città."},
+     {t:"mc",k:"Milano",q:"Milano è nel nord o nel sud dell’Italia?",o:["Nel sud","Nel nord","Al centro"],a:1,h:["","",""],h1:"Pensa alla Lombardia.",r:"Milano è in Lombardia, nel nord dell’Italia."},
+     {t:"type",k:"Milano",q:"Per che cosa è famosa Milano? Scrivi una parola: la ____.",a:["moda"],h1:"Milano Fashion Week!",r:"Milano è la capitale della moda."}],
+ clue:"Il ladro / La ladra è a Milano, vicino al Duomo.",
+ help:["Milano è la città della moda: la Milano Fashion Week!","nel nord = im Norden · nel sud = im Süden"]},
+7:{title:"Le taglie",story:"Nel negozio «Moda Duomo» una commessa / un commesso ricorda il cliente / la cliente. Completa i dialoghi.",
+ qs:[{t:"mc",k:"quello",q:"— Ecco due giacche. — Preferisco ___ lunga!",o:["quella","quello","quelle"],a:0,h:["","Quello è maschile. La giacca è femminile.","Quelle è plurale. Qui si parla di una giacca."],h1:"Giacca: femminile singolare.",r:RULE_Q,
+       v:{q:"— Ecco due cappelli. — Preferisco ___ rosso!",o:["quello","quella","quelle"],a:0}},
+     {t:"mc",k:"aggettivi",q:"La giacca è troppo ___. Prendo la taglia più grande.",o:["piccola","piccolo","piccole"],a:0,h:["","Piccolo è maschile. La giacca è femminile.","Piccole è plurale."],h1:"Gli aggettivi cambiano come il nome.",r:"Gli aggettivi cambiano: la giacca piccola · le giacche piccole · il cappello piccolo · i cappelli piccoli.",
+       v:{q:"I pantaloni sono troppo ___.",o:["grande","grandi","grando"],a:1}},
+     {t:"mc",k:"i numeri",q:"Come si dice 44?",o:["quarantaquattro","quarantaquatro","quattrocinquanta"],a:0,h:["","Attenzione: quattro si scrive con tt.","40 = quaranta, 4 = quattro."],h1:"40 + 4.",r:"44 = quaranta + quattro = quarantaquattro.",
+       v:{q:"Come si dice 36?",o:["trentasei","trentasesi","sessantatre"],a:0}},
+     {t:"type",k:"aggettivi",q:"Il contrario di «corta» è ______.",a:["lunga"],h1:"Il contrario: non corta, ma …?",r:"corta ≠ lunga · piccola ≠ grande · stretta ≠ larga",
+       v:{q:"Il contrario di «piccolo» è ______.",a:["grande"]}}],
+ review:{from:1,to:6},
+ clue:"Il ladro / La ladra voleva una giacca molto lunga e larga. Che cosa nasconde?",
+ help:["lungo = lang · corto = kurz · largo = weit · stretto = eng","44 = quarantaquattro · 36 = trentasei"]},
+8:{title:"La passerella",story:"Alla Milano Fashion Week la stilista Chiara presenta la sua collezione. Guarda il look e rispondi.",photo:{src:"fotos/d08-sfilata.jpg",alt:"Modelle e modelli sulla passerella di una sfilata"},
+ qs:[{t:"mc",k:"quello",q:"Quali pantaloni porta il modello? — ___ neri!",o:["Quelli","Quelle","Quello"],a:0,h:["","Quelle è femminile. I pantaloni sono maschili.","Quello è singolare. I pantaloni sono plurale."],h1:"I pantaloni: maschile plurale.",r:RULE_Q,
+       v:{q:"Quali scarpe porta la modella? — ___ bianche!",o:["Quelle","Quelli","Quella"],a:0}},
+     {t:"mc",k:"indossare",q:"La modella ___ un vestito lungo.",o:["indossa","indossano","indossi"],a:0,h:["","Indossano = loro. «La modella» è una persona.","Indossi = tu."],h1:"«La modella» = lei.",r:"indossare: io indosso · tu indossi · lui/lei indossa · noi indossiamo · voi indossate · loro indossano.",
+       v:{q:"I modelli ___ pantaloni blu.",o:["indossa","indossano","indosso"],a:1}},
+     {t:"type",k:"i colori",q:"Le scarpe sono ______. (nero)",a:["nere"],h1:"Scarpe: femminile plurale. Nero → ?",r:RULE_COL,
+       v:{q:"Le magliette sono ______. (bianco)",a:["bianche"]}},
+     {t:"mc",k:"Milano",q:"Dove si trova la Fashion Week che vedi?",o:["A Milano","A Napoli","A Palermo"],a:0,h:["","Napoli è nel sud. La moda è famosa a Milano.","Palermo è in Sicilia. La moda è famosa a Milano."],h1:"Pensa alla capitale della moda.",r:"La Milano Fashion Week si trova a Milano."}],
+ clue:"Sulla passerella la stilista Chiara porta una giacca rossa. Anche lei è sospettata?",
+ help:["il modello = Model (m.) · la modella = Model (f.)","quelli neri = die schwarzen (m. pl.) · quelle nere = die schwarzen (f. pl.)"]},
+9:{title:"Gli alibi",story:"Sono le 21:30 del 30 novembre. Dove sono i sospettati? Leggi che cosa dicono.",
+ note:"<b>Marco, il pasticciere:</b> Mi sveglio alle tre di notte e mi vesto subito. Alle nove e mezza sono in pasticceria con i clienti.<br><b>Luca, il fotografo:</b> Mi alzo alle sette. La sera sono al giardino botanico con la macchina fotografica.<br><b>Chiara, la stilista:</b> Mi lavo e mi vesto in fretta. Alle 21:30 sono alla sfilata.<br><b>La Befana:</b> Mi sveglio alle otto di sera e mi vesto. Poi esco.",
+ qs:[{t:"mc",k:"i verbi riflessivi",q:"Marco ___ alle tre di notte.",o:["si sveglia","mi sveglio","si svegliano"],a:0,h:["","«Mi sveglio» = io. Marco = lui.","«Si svegliano» = loro. Marco è una persona."],h1:"Marco = lui. Quale pronome?",r:RULE_R,
+       v:{q:"Luca ___ alle sette.",o:["si alza","mi alzo","ti alzi"],a:0}},
+     {t:"mc",k:"i verbi riflessivi",q:"Io ___ alle otto. (alzarsi)",o:["mi alzo","si alza","ti alzi"],a:0,h:["","«Si alza» = lui/lei. Qui: io.","«Ti alzi» = tu. Qui: io."],h1:"Io → mi …",r:"alzarsi: mi alzo · ti alzi · si alza · ci alziamo · vi alzate · si alzano.",
+       v:{q:"Tu ___ alle sette? (svegliarsi)",o:["ti svegli","mi sveglio","si sveglia"],a:0}},
+     {t:"type",k:"i verbi riflessivi",q:"Chiara ______ in fretta. (vestirsi) Scrivi due parole.",a:["si veste"],h1:"Chiara = lei: si + verbo in -e.",r:"vestirsi: mi vesto · ti vesti · si veste · ci vestiamo · vi vestite · si vestono.",
+       v:{q:"Io ______ subito. (vestirsi) Scrivi due parole.",a:["mi vesto"]}},
+     {t:"mc",k:"comprensione",q:"Chi si sveglia alle otto di sera?",o:["Marco","Luca","La Befana"],a:2,h:["Marco si sveglia alle tre di notte.","Luca si alza alle sette (di mattina).",""],h1:"Rileggi gli alibi.",r:"La Befana: «Mi sveglio alle otto di sera.»"}],
+ clue:"Marco, Luca e Chiara dicono dove sono alle 21:30. La Befana si sveglia alle otto di sera e non dice dove va.",
+ help:["svegliarsi = aufwachen · alzarsi = aufstehen · vestirsi = sich anziehen · lavarsi = sich waschen","mi · ti · si · ci · vi · si davanti al verbo"]},
+10:{title:"La borsa",story:"Al mercatino un poliziotto / una poliziotta trova una borsa. È la borsa del ladro / della ladra! Leggi la lista e rispondi.",
+ note:"<b>Nella borsa:</b> una sciarpa verde, un cappello blu, due guanti neri, carbone dolce e tante caramelle.",
+ qs:[{t:"mc",k:"comprensione",q:"Nella borsa c’è un oggetto strano per un ladro / una ladra. Quale?",o:["Una sciarpa verde","Carbone dolce e caramelle","Un cappello blu"],a:1,h:["Una sciarpa è un vestito normale.","","Un cappello è un vestito normale."],h1:"Quali oggetti non sono vestiti?",r:"Sciarpa, cappello e guanti sono vestiti. Carbone dolce e caramelle sono dolci: sono oggetti strani nella borsa di un ladro / una ladra."},
+     {t:"mc",k:"lo/la/li/le",q:"Il ladro / La ladra ha un cappello blu. → ___ porta sempre.",o:["Lo","La","Li"],a:0,h:["","La = femminile. Il cappello è maschile.","Li = plurale. Un cappello è singolare."],h1:"Cappello: maschile singolare.",r:RULE_P,
+       v:{q:"Ha una sciarpa verde. → ___ porta sempre.",o:["La","Lo","Li"],a:0}},
+     {t:"mc",k:"i colori",q:"Ha due guanti ___.",o:["neri","nere","nero"],a:0,h:["","Nere è femminile. Guanti è maschile.","Nero è singolare. Due guanti: plurale."],h1:"Guanti: maschile plurale.",r:RULE_COL,
+       v:{q:"Ha due gonne ___.",o:["rosse","rossi","rosso"],a:0}},
+     {t:"type",k:"quello",q:"Quali guanti sono nella borsa? — ______ neri! (una parola)",a:["quelli"],h1:"Guanti: maschile plurale.",r:RULE_Q,
+       v:{q:"Quale borsa? — ______ rossa! (una parola)",a:["quella"]}}],
+ clue:"Nella borsa del ladro / della ladra ci sono carbone dolce e caramelle. Chi porta il carbone dolce ai bambini?",
+ help:["lo = il cappello · la = la sciarpa · li = i guanti · le = le scarpe","carbone = Kohle · dolce = süß · caramelle = Bonbons"]},
+11:{title:"Il messaggio",story:"Nella borsa c’è anche un messaggio. Il biglietto profuma di caramelle. Il ladro / La ladra scrive ai bambini e alle bambine. Leggi con attenzione.",
+ note:"Non cercate Babbo Natale!<br>Domani portate un regalo al mercatino.<br>Lasciate il regalo sul tavolo e andate a casa.<br><i>Firmato: un amico / un’amica</i>",
+ qs:[{t:"mc",k:"comprensione",q:"Che cosa devono portare i bambini e le bambine al mercatino?",o:["Un regalo","Una scopa","Un panettone"],a:0,h:["","Nel messaggio non c’è la parola «scopa».","Nel messaggio non c’è la parola «panettone»."],h1:"Cerca la parola «portate».",r:"Nel messaggio: «portate un regalo al mercatino»."},
+     {t:"type",k:"imperativo",q:"Scrivi l’ordine: (portare, voi) ______ un regalo!",a:["portate"],h1:"Voi: -are → -ate.",r:"Imperativo «voi»: -are → -ate (portate) · -ere → -ete (prendete) · -ire → -ite (dormite). Irregolare: andare → andate.",
+       v:{q:"Scrivi l’ordine: (lasciare, voi) ______ il regalo!",a:["lasciate"]}},
+     {t:"type",k:"imperativo",q:"Scrivi l’ordine: (andare, voi) ______ a casa!",a:["andate"],h1:"Andare: and-ate.",r:"Imperativo «voi»: -are → -ate (portate) · -ere → -ete (prendete) · -ire → -ite (dormite). Irregolare: andare → andate.",
+       v:{q:"Scrivi l’ordine: (prendere, voi) ______ il sacco!",a:["prendete"]}},
+     {t:"mc",k:"comprensione",q:"Di che cosa profuma il biglietto?",o:["Di caramelle","Di pizza","Di cioccolato"],a:0,h:["","Rileggi la storia: «profuma di …».","Rileggi la storia: «profuma di …»."],h1:"Rileggi la storia sopra.",r:"Nella storia: «Il biglietto profuma di caramelle»."}],
+ clue:"Il biglietto profuma di caramelle. Marco fa i dolci, ma anche la Befana porta i dolci ai bambini.",
+ help:["Imperativo «voi»: portare → portate · prendere → prendete · dormire → dormite","Irregolare: andare → andate"]},
+12:{title:"Al mercatino",story:"Un venditore / Una venditrice del mercatino racconta che cosa ha visto la sera del 30 novembre.",
+ note:"«Alle 21:40 una persona è arrivata alla mia bancarella. Ha comprato una sciarpa verde. Poi è andata dietro la bancarella e ha perso un foglio con dei numeri.»",
+ qs:[{t:"mc",k:"passato prossimo",q:"Una persona ___ alla bancarella. (arrivare)",o:["è arrivata","ha arrivato","è arrivato"],a:0,h:["","Arrivare vuole «essere», non «avere».","«Persona» è femminile: arrivata, non arrivato."],h1:"Arrivare: essere + participio.",r:"Arrivare, andare, uscire → essere. Il participio cambia: lei è arrivata · lui è arrivato · loro sono arrivati / arrivate.",
+       v:{q:"Le ragazze ___ al mercatino. (arrivare)",o:["sono arrivate","hanno arrivato","sono arrivati"],a:0}},
+     {t:"type",k:"passato prossimo",q:"Il ladro / La ladra ______ una sciarpa verde. (comprare) Scrivi due parole.",a:["ha comprato"],h1:"Comprare: avere + participio.",r:"avere + participio: ho comprato · hai comprato · ha comprato · abbiamo comprato · avete comprato · hanno comprato.",
+       v:{q:"Io ______ un cappello blu. (comprare) Scrivi due parole.",a:["ho comprato"]}},
+     {t:"mc",k:"passato prossimo",q:"Poi la persona ___ dietro la bancarella. (andare)",o:["è andata","ha andato","è andato"],a:0,h:["","Andare vuole «essere».","«Persona» è femminile: andata."],h1:"Andare: essere + participio.",r:"Arrivare, andare, uscire → essere. Il participio cambia: lei è andata · lui è andato · loro sono andati / andate.",
+       v:{q:"Anna ___ a casa alle dieci. (andare)",o:["è andata","ha andato","è andato"],a:0}},
+     {t:"mc",k:"comprensione",q:"Che cosa ha perso la persona?",o:["Un foglio con dei numeri","Una sciarpa verde","Un cappello blu"],a:0,h:["","Leggi: «ha perso …».","Nel racconto non c’è un cappello."],h1:"Cerca la parola «perso».",r:"Nel racconto: «ha perso un foglio con dei numeri»."},
+     {t:"mc",k:"lo/la/li/le",q:"La persona vede due borse nere. → ___ compra.",o:["Le","Li","La"],a:0,h:["","Li = maschile plurale. Le borse sono femminili.","La = singolare. Due borse: plurale."],h1:"Borse: femminile plurale.",r:RULE_P,
+       v:{q:"Vede i guanti neri. → ___ compra.",o:["Li","Le","Lo"],a:0}}],
+ clue:"Una persona con la sciarpa verde è andata dietro la bancarella e ha perso un foglio con dei numeri.",
+ help:["essere + participio: è arrivata (lei) · è arrivato (lui) · sono arrivati / arrivate (loro)","avere + participio: ha comprato · ha perso"]},
+13:{title:"Santa Lucia",story:"Il 13 dicembre è un giorno speciale in Italia. Leggi il testo su Santa Lucia. Poi rispondi.",
+ note:"<b>Santa Lucia</b><br>Il 13 dicembre in alcune città del nord, per esempio a Verona e a Bergamo, Santa Lucia porta i regali ai bambini. I bambini preparano un bicchiere di latte, dei biscotti e un po’ di fieno per l’asino di Santa Lucia. Poi vanno a letto. Di notte Santa Lucia arriva con il suo asino e lascia i regali.<br><i>(Testo semplificato, scritto per questa classe)</i>",
+ qs:[{t:"mc",k:"comprensione",q:"Quando è la festa di Santa Lucia?",o:["Il 13 dicembre","Il 24 dicembre","Il 6 gennaio"],a:0,h:["","Il 24 dicembre è la Vigilia di Natale.","Il 6 gennaio arriva la Befana."],h1:"Leggi la prima riga del testo.",r:"Nel testo: «Il 13 dicembre … Santa Lucia porta i regali»."},
+     {t:"mc",k:"comprensione",q:"Che cosa preparano i bambini per l’asino?",o:["Un po’ di fieno","Una giacca","Un panettone"],a:0,h:["","Una giacca non è un cibo per l’asino.","Nel testo non c’è il panettone."],h1:"Cerca la parola «asino» nel testo.",r:"Nel testo: «un po’ di fieno per l’asino di Santa Lucia»."},
+     {t:"type",k:"i numeri",q:"Scrivi il numero in lettere: il 13 dicembre = il ______ dicembre.",a:["tredici"],h1:"12 = dodici, 14 = quattordici. E 13?",r:"11 undici · 12 dodici · 13 tredici · 14 quattordici · 15 quindici · 16 sedici.",
+       v:{q:"Scrivi il numero in lettere: il 15 dicembre = il ______ dicembre.",a:["quindici"]}},
+     {t:"mc",k:"i verbi riflessivi",q:"I bambini e le bambine ___ presto la mattina. (alzarsi)",o:["si alzano","si alza","ci alziamo"],a:0,h:["","«Si alza» = lui/lei. Qui: loro.","«Ci alziamo» = noi. Qui: loro."],h1:"I bambini = loro.",r:"alzarsi: mi alzo · ti alzi · si alza · ci alziamo · vi alzate · si alzano.",
+       v:{q:"Tu ___ presto la mattina? (alzarsi)",o:["ti alzi","mi alzo","si alza"],a:0}},
+     {t:"mc",k:"comprensione",q:"Santa Lucia porta i regali in tutta l’Italia?",o:["No, in alcune città del nord","Sì, in tutta l’Italia","Solo a Milano"],a:0,h:["","Leggi bene: «in alcune città del nord».","Nel testo: Verona e Bergamo, non Milano."],h1:"Leggi: «in alcune città del nord».",r:"Nel testo: «in alcune città del nord, per esempio a Verona e a Bergamo»."}],
+ clue:"Anche la Befana porta i regali, ma arriva solo il 6 gennaio. Forse è triste?",
+ help:["il fieno = Heu · l’asino = Esel · il bicchiere = Glas","13 = tredici · 15 = quindici"]},
+14:{title:"Il messaggio di Chiara",story:"Chiara ha lasciato un messaggio vocale. Leggi che cosa dice.",
+ note:"«Ciao, sono Chiara. Stasera la sfilata inizia alle 21:00 e finisce alle 22:00. Alle 21:30 sono sulla passerella con i modelli e le modelle. Dopo la sfilata mi lavo e mi vesto nel backstage. Chiamami più tardi!»",
+ qs:[{t:"mc",k:"comprensione",q:"Dove è Chiara alle 21:30?",o:["Sulla passerella","Al mercatino","In pasticceria"],a:0,h:["","Il mercatino è il posto del ladro / della ladra. Dov’è Chiara?","Chiara non parla della pasticceria."],h1:"Cerca «Alle 21:30 sono …».",r:"Nel messaggio: «Alle 21:30 sono sulla passerella»."},
+     {t:"mc",k:"l’ora",q:"A che ora inizia la sfilata?",o:["Alle nove di sera","Alle nove di mattina","Alle dieci di sera"],a:0,h:["","21:00 = sera, non mattina.","Alle 22:00 finisce la sfilata."],h1:"21:00 = 21 − 12 = 9.",r:"21:00 = le nove di sera · 22:00 = le dieci di sera · 23:00 = le undici di sera.",
+       v:{q:"La festa finisce alle 23:00. Come si dice?",o:["Alle undici di sera","Alle tre di sera","Alle nove di sera"],a:0}},
+     {t:"type",k:"i verbi riflessivi",q:"Dopo la sfilata Chiara ______ nel backstage. (lavarsi) Scrivi due parole.",a:["si lava"],h1:"Chiara = lei: si + verbo.",r:"lavarsi: mi lavo · ti lavi · si lava · ci laviamo · vi lavate · si lavano.",
+       v:{q:"Io ______ la mattina. (lavarsi) Scrivi due parole.",a:["mi lavo"]}},
+     {t:"mc",k:"comprensione",q:"Il ladro / La ladra è al mercatino alle 21:30. Può essere Chiara?",o:["No: alle 21:30 Chiara è alla sfilata.","Sì: Chiara ha una giacca rossa.","Sì: Chiara è una stilista."],a:0,h:["","Anche altre persone possono comprare la giacca rossa.","Il lavoro di una persona non è una prova."],h1:"Dove è Chiara alle 21:30?",r:"Alle 21:30 Chiara è alla sfilata. Non può essere al mercatino: ha un alibi."}],
+ clue:"Chiara è alla sfilata dalle 21:00 alle 22:00. La sua giacca rossa è in vendita da «Moda Duomo»: tutti possono comprare la giacca. Chiara ha un alibi!",
+ help:["inizia = beginnt · finisce = endet","21:00 = le nove di sera · 22:00 = le dieci di sera"]},
+15:{title:"La foto di Luca",story:"Luca è fotografo. Guarda la sua foto con la data e l’ora. Poi leggi che cosa dice il guardiano / la guardiana del giardino botanico.",photo:{src:"fotos/d15-giardino.jpg",alt:"Il giardino botanico di notte con la data e l’ora",stamp:"30.11.2026 · 21:30"},
+ note:"<b>Il guardiano / La guardiana:</b> Luca è qui dalle 20:00 alle 23:00. Fa foto agli alberi di notte. Porta una giacca verde, un cappello grigio e scarpe marroni.",
+ qs:[{t:"mc",k:"l’ora",q:"Che ora è nella foto?",o:["21:30","20:30","9:30 di mattina"],a:0,h:["","20:30 = le otto e mezza. Nella foto: 21:30.","Il giardino è di notte, non di mattina."],h1:"Guarda la foto: in basso c’è l’ora.",r:"21:30 = le nove e mezza di sera.",
+       v:{q:"Nella foto c’è scritto 22:30. Come si dice?",o:["Alle dieci e mezza di sera","Alle due e mezza","Alle nove e mezza di sera"],a:0}},
+     {t:"mc",k:"i colori",q:"Luca porta una giacca ___ e un cappello ___.",o:["verde / grigio","verda / grigia","verdi / grigi"],a:0,h:["","«Verda» non esiste.","Una giacca e un cappello: singolare."],h1:"Una giacca, un cappello: singolare.",r:RULE_COL,
+       v:{q:"Ha due sciarpe ___ e due cappelli ___.",o:["verdi / grigi","verde / grigio","verdi / grigie"],a:0}},
+     {t:"mc",k:"i colori",q:"Luca porta scarpe ___.",o:["marroni","marrone","marrona"],a:0,h:["","Marrone è singolare. Scarpe: plurale.","«Marrona» non esiste."],h1:"Scarpe: plurale. Marrone → ?",r:RULE_COL+" Anche: marrone → marroni.",
+       v:{q:"Ha un cappotto ___.",o:["marrone","marroni","marrona"],a:0}},
+     {t:"mc",k:"comprensione",q:"Alle 21:30 Luca è al giardino botanico. È il ladro / la ladra?",o:["No: ha un alibi con la foto e il guardiano / la guardiana.","Sì: porta una giacca verde.","Sì: fa foto di notte."],a:0,h:["","Il ladro / La ladra porta una giacca rossa, non verde.","Fare foto di notte non è una prova."],h1:"Dove è Luca alle 21:30?",r:"La foto è del 30.11. alle 21:30 al giardino botanico: Luca ha un alibi."}],
+ clue:"Luca è al giardino botanico dalle 20:00 alle 23:00. La foto ha la data e l’ora: 30.11., 21:30. Luca ha un alibi!",
+ help:["il guardiano = Wächter · la guardiana = Wächterin","verde → verdi · grigio → grigi · marrone → marroni"]},
+16:{title:"Le tracce",story:"Alle 22:00 un poliziotto / una poliziotta arriva al mercatino. Leggi il suo rapporto.",photo:{src:"fotos/d16-tracce.jpg",alt:"Tracce nella neve davanti a un mercatino di Natale"},
+ note:"<b>Rapporto:</b> Alle 22:00 sono arrivato/a al mercatino. Ho visto tracce di renna nella neve. Ho seguito le tracce fino a una bancarella. Un venditore / Una venditrice ha detto: «Una signora è andata via con un grande sacco.»",
+ qs:[{t:"type",k:"passato prossimo",q:"Il poliziotto / La poliziotta ______ le tracce di renna. (vedere) Scrivi due parole.",a:["ha visto","ha veduto"],h1:"Vedere: avere + participio (visto).",r:"avere + participio: ho visto · hai visto · ha visto · abbiamo visto · avete visto · hanno visto.",
+       v:{q:"Io ______ le tracce. (vedere) Scrivi due parole.",a:["ho visto","ho veduto"]}},
+     {t:"mc",k:"comprensione",q:"Che cosa ha seguito il poliziotto / la poliziotta?",o:["Le tracce di renna","Le tracce di una slitta","Le tracce di un treno"],a:0,h:["","Nel rapporto non c’è la parola «slitta».","Nel rapporto non c’è la parola «treno»."],h1:"Cerca «ho seguito».",r:"Nel rapporto: «Ho seguito le tracce di renna»."},
+     {t:"mc",k:"passato prossimo",q:"Una signora ___ via con un grande sacco. (andare)",o:["è andata","ha andato","è andato"],a:0,h:["","Andare vuole «essere».","«Signora» è femminile: andata."],h1:"Andare: essere + participio.",r:"Arrivare, andare, uscire → essere. Il participio cambia: lei è andata · lui è andato.",
+       v:{q:"Anna ___ a Milano. (andare)",o:["è andata","ha andato","è andato"],a:0}},
+     {t:"mc",k:"comprensione",q:"Dove vanno le tracce?",o:["Fino a una bancarella","Fino al Duomo","Fino alla pasticceria"],a:0,h:["","Nel rapporto non c’è il Duomo.","Nel rapporto non c’è la pasticceria."],h1:"Cerca «fino a».",r:"Nel rapporto: «Ho seguito le tracce fino a una bancarella»."},
+     {t:"type",k:"passato prossimo",q:"Una signora ______ un sacco grande. (portare) Scrivi due parole.",a:["ha portato"],h1:"Portare: avere + participio.",r:"avere + participio: ho portato · ha portato · hanno portato.",
+       v:{q:"Io ______ un regalo. (portare) Scrivi due parole.",a:["ho portato"]}}],
+ clue:"Le tracce di renna vanno a una bancarella. Una signora è andata via con un grande sacco.",
+ help:["avere + participio: ho visto · ha visto · ha portato","essere + participio: è andata (lei) · è andato (lui)"]},
+17:{title:"Gli scontrini di Marco",story:"Marco è pasticciere. Vende torrone nella pasticceria. Guarda gli scontrini del 30 novembre.",
+ note:"<b>Scontrini · 30.11.</b><br>21:28 · 1 torrone · 4 €<br>21:35 · 2 torroni · 8 €<br>22:10 · 3 torroni · 12 €<br><i>I clienti dicono: «Marco è sempre dietro il bancone!»</i>",
+ qs:[{t:"type",k:"i numeri",q:"Quanti euro in tutto? Scrivi solo il numero.",a:["24"],h1:"4 + 8 + 12 = ?",r:"4 + 8 + 12 = 24",
+       v:{q:"Scontrini: 5 € · 10 € · 15 €. Quanti euro in tutto? Scrivi solo il numero.",a:["30"]}},
+     {t:"mc",k:"comprensione",q:"Marco vende torrone dalle 21:28 alle 22:10. Dove è Marco alle 21:30?",o:["In pasticceria","Al mercatino","Alla sfilata"],a:0,h:["","Il mercatino è il posto del ladro / della ladra.","La sfilata è il posto di Chiara."],h1:"Guarda gli orari degli scontrini.",r:"Gli scontrini sono delle 21:28 e delle 21:35: Marco è in pasticceria."},
+     {t:"mc",k:"lo/la/li/le",q:"I clienti vedono i torroni. → ___ comprano.",o:["Li","Le","Lo"],a:0,h:["","Le = femminile plurale. I torroni sono maschili.","Lo = singolare. I torroni: plurale."],h1:"Torroni: maschile plurale.",r:RULE_P,
+       v:{q:"I clienti vedono le caramelle. → ___ comprano.",o:["Le","Li","La"],a:0}},
+     {t:"mc",k:"quello",q:"Quale torrone costa 4 euro? — ___ piccolo!",o:["Quello","Quella","Quelli"],a:0,h:["","Quella è femminile. Il torrone è maschile.","Quelli è plurale. Un torrone: singolare."],h1:"Il torrone: maschile singolare.",r:RULE_Q,
+       v:{q:"Quali torroni costano 8 euro? — ___ grandi!",o:["Quelli","Quello","Quelle"],a:0}},
+     {t:"type",k:"i numeri",q:"Quanti torroni ha venduto Marco in tutto? Scrivi solo il numero.",a:["6"],h1:"1 + 2 + 3 = ?",r:"1 + 2 + 3 = 6",
+       v:{q:"Anna compra 2 torroni e Luca compra 4 torroni. Quanti torroni in tutto? Scrivi solo il numero.",a:["6"]}}],
+ clue:"Marco è in pasticceria dalle 21:28 alle 22:10: gli scontrini e i clienti lo confermano. Marco ha un alibi!",
+ help:["4 + 8 + 12 = ? · 1 + 2 + 3 = ?","il bancone = Theke"]},
+18:{title:"La tombola",story:"Al mercatino c’è una tombola (Bingo-Spiel). Hai trovato il foglio che il ladro / la ladra ha perso. Leggi i numeri.",
+ note:"<b>Foglio perso al mercatino</b><br>trentacinque – quarantasette – trentaquattro<br><i>La mia bancarella ha il numero più alto.</i>",
+ qs:[{t:"mc",k:"i numeri",q:"Quale numero è il più alto?",o:["trentacinque","quarantasette","trentaquattro"],a:1,h:["35 è più basso di 47.","","34 è più basso di 47."],h1:"30 = trenta · 40 = quaranta. Quale numero è più alto?",r:"trenta = 30 · quaranta = 40. Il numero più alto è quarantasette (47)."},
+     {t:"type",k:"i numeri",q:"Scrivi il numero in cifre: quarantasette = ___",a:["47"],h1:"quaranta + sette.",r:"quaranta (40) + sette (7) = quarantasette = 47.",
+       v:{q:"Scrivi il numero in cifre: trentacinque = ___",a:["35"]}},
+     {t:"mc",k:"i numeri",q:"Come si dice 38?",o:["trentotto","trentaotto","ottantatre"],a:0,h:["","Con otto si perde la vocale.","83 = ottantatre. Qui: 38."],h1:"30 + 8. Attenzione alla vocale!",r:"Con uno e otto si perde la vocale: trentuno, trentotto, quarantuno, quarantotto.",
+       v:{q:"Come si dice 48?",o:["quarantotto","quarantaotto","ottantaquattro"],a:0}}],
+ review:{from:7,to:17},
+ clue:"Sul foglio c’è un numero importante: 47. È il numero di una bancarella. Forse Babbo Natale è lì!",
+ help:["30 trenta · 35 trentacinque · 40 quaranta · 47 quarantasette","uno e otto: la vocale cade → trentotto, quarantotto"]},
+19:{title:"Il sacco",story:"Dietro il negozio «Moda Duomo» un commesso / una commessa trova un sacco con vestiti vecchi. Leggi la lista.",photo:{src:"fotos/d19-sacco.jpg",alt:"Un grande sacco con vestiti vecchi"},
+ note:"<b>Nel sacco:</b> una gonna lunga e nera, un fazzoletto rosso, un cappotto grigio e scarpe vecchie e rotte.",
+ qs:[{t:"mc",k:"i colori",q:"La gonna è lunga e ___. (nero)",o:["nera","nero","nere"],a:0,h:["","Nero è maschile. La gonna è femminile.","Nere è plurale. Una gonna: singolare."],h1:"Gonna: femminile singolare.",r:RULE_COL,
+       v:{q:"Il cappotto è lungo e ___. (grigio)",o:["grigio","grigia","grigi"],a:0}},
+     {t:"mc",k:"aggettivi",q:"Le scarpe sono ___. (vecchio)",o:["vecchie","vecchi","vecchia"],a:0,h:["","Vecchi è maschile. Le scarpe sono femminili.","Vecchia è singolare. Le scarpe: plurale."],h1:"Scarpe: femminile plurale.",r:"vecchio → vecchia · vecchi · vecchie. Gli aggettivi cambiano come il nome.",
+       v:{q:"I guanti sono ___. (vecchio)",o:["vecchi","vecchie","vecchio"],a:0}},
+     {t:"mc",k:"quello",q:"Quale gonna? — ___ lunga e nera!",o:["Quella","Quello","Quelle"],a:0,h:["","Quello è maschile. La gonna è femminile.","Quelle è plurale. Una gonna: singolare."],h1:"Gonna: femminile singolare.",r:RULE_Q,
+       v:{q:"Quale cappotto? — ___ grigio!",o:["Quello","Quella","Quelli"],a:0}},
+     {t:"mc",k:"lo/la/li/le",q:"Il commesso / La commessa trova le scarpe. → ___ guarda.",o:["Le","Li","La"],a:0,h:["","Li = maschile plurale. Le scarpe sono femminili.","La = singolare. Le scarpe: plurale."],h1:"Scarpe: femminile plurale.",r:RULE_P,
+       v:{q:"Trova il cappotto. → ___ guarda.",o:["Lo","La","Li"],a:0}},
+     {t:"type",k:"vestiti",q:"Fa freddo. Metto il ______ e i guanti. (Mantel)",a:["cappotto"],h1:"È grigio e lungo: guarda la lista del sacco.",r:"il cappotto = Mantel. Nella lista: «un cappotto grigio»."}],
+ clue:"Dietro il negozio c’è un sacco con vestiti vecchi: gonna, fazzoletto rosso e scarpe rotte. Sono i vestiti del ladro / della ladra?",
+ help:["la gonna = Rock · il fazzoletto = Tuch · il cappotto = Mantel","vecchio → vecchia · vecchi · vecchie"]},
+20:{title:"Il cenone",story:"Marco ha tanto lavoro prima di Natale. Leggi che cosa fanno le famiglie italiane a Natale.",
+ note:"<b>La Vigilia in Italia</b><br>La sera del 24 dicembre, la Vigilia, molte famiglie italiane fanno il cenone. Spesso mangiano pesce. Il 25 dicembre c’è il pranzo di Natale con tutta la famiglia. Alla fine ci sono il panettone e il torrone.<br><i>(Testo semplificato, scritto per questa classe)</i>",
+ qs:[{t:"mc",k:"comprensione",q:"Quando è la Vigilia?",o:["Il 24 dicembre","Il 25 dicembre","Il 6 gennaio"],a:0,h:["","Il 25 dicembre c’è il pranzo di Natale.","Il 6 gennaio arriva la Befana."],h1:"Leggi la prima riga del testo.",r:"Nel testo: «La sera del 24 dicembre, la Vigilia»."},
+     {t:"mc",k:"comprensione",q:"Che cosa mangiano spesso le famiglie alla Vigilia?",o:["Pesce","Pizza","Hamburger"],a:0,h:["","Nel testo non c’è la pizza.","Nel testo non ci sono gli hamburger."],h1:"Cerca «Spesso mangiano …».",r:"Nel testo: «Spesso mangiano pesce»."},
+     {t:"mc",k:"lo/la/li/le",q:"Marco prepara il panettone. → ___ prepara per la Vigilia.",o:["Lo","La","Li"],a:0,h:["","La = femminile. Il panettone è maschile.","Li = plurale. Un panettone: singolare."],h1:"Panettone: maschile singolare.",r:RULE_P,
+       v:{q:"Marco prepara le torte. → ___ prepara per la festa.",o:["Le","Li","La"],a:0}},
+     {t:"type",k:"i verbi riflessivi",q:"Per il cenone noi ______ bene. (vestirsi) Scrivi due parole.",a:["ci vestiamo"],h1:"Noi: ci + verbo.",r:"vestirsi: mi vesto · ti vesti · si veste · ci vestiamo · vi vestite · si vestono.",
+       v:{q:"Voi ______ bene per la festa? (vestirsi) Scrivi due parole.",a:["vi vestite"]}}],
+ clue:"Marco prepara molti panettoni per la Vigilia. Ha poco tempo per rapire Babbo Natale.",
+ help:["il pesce = Fisch · il pranzo = Mittagessen · la cena = Abendessen","vestirsi: ci vestiamo (noi) · vi vestite (voi)"]},
+21:{title:"La scopa",story:"Qualcuno è sparito di notte con un sacco grande. Chi sa volare? Scopri chi può essere.",
+ qs:[{t:"mc",k:"comprensione",q:"Chi sa volare con la scopa?",o:["La Befana","Marco, il pasticciere","Luca, il fotografo"],a:0,h:["","Marco fa il torrone: non vola con la scopa.","Luca fa le foto: non vola con la scopa."],h1:"Pensa alla Befana: com’è il suo mezzo di trasporto?",r:"Nella tradizione italiana la Befana vola con la scopa."},
+     {t:"mc",k:"modali",q:"Marco e Luca non ___ volare.",o:["sanno","sa","sapete"],a:0,h:["","«Sa» = lui/lei. Qui: loro.","«Sapete» = voi. Qui: loro."],h1:"Marco e Luca = loro.",r:"sapere: so · sai · sa · sappiamo · sapete · sanno.",
+       v:{q:"Voi ___ ballare?",o:["sapete","sanno","sai"],a:0}},
+     {t:"mc",k:"modali",q:"Chiara non ___ lasciare la sfilata alle 21:30.",o:["ha potuto","è potuta","ha potuta"],a:0,h:["","Lasciare vuole «avere»: ha potuto.","Il participio di «potere» non cambia: potuto."],h1:"Modale + infinito al passato prossimo: avere + potuto.",r:"Modali al passato prossimo: ho potuto · ha voluto · abbiamo dovuto. Il participio non cambia.",
+       v:{q:"Marco non ___ chiudere la pasticceria alle 21:30.",o:["ha potuto","è potuto","ha potuta"],a:0}},
+     {t:"mc",k:"modali",q:"Per salvare il Natale noi ___ trovare Babbo Natale.",o:["dobbiamo","devo","dovete"],a:0,h:["","«Devo» = io. Qui: noi.","«Dovete» = voi. Qui: noi."],h1:"Noi → dobb…",r:"dovere: devo · devi · deve · dobbiamo · dovete · devono.",
+       v:{q:"Io ___ studiare per la verifica.",o:["devo","deve","dobbiamo"],a:0}},
+     {t:"type",k:"modali",q:"Il ladro / La ladra vuole nascondere Babbo Natale. Scrivi: «Io ______ un sacco grande.» (volere)",a:["voglio"],h1:"volere: voglio · vuoi · vuole …",r:"volere: voglio · vuoi · vuole · vogliamo · volete · vogliono.",
+       v:{q:"Scrivi: «Io ______ un panettone.» (volere)",a:["voglio"]}}],
+ clue:"Solo la Befana sa volare con la scopa. Marco, Luca e Chiara non sanno volare.",
+ help:["sapere: so · sai · sa · sappiamo · sapete · sanno","potere: posso · puoi · può · possiamo · potete · possono · dovere: devo · devi · deve · dobbiamo · dovete · devono"]},
+22:{title:"Il travestimento",story:"La polizia confronta due liste di vestiti. Una lista è del mercatino. L’altra lista è del sacco. Chi si veste così? Attenzione: questo fascicolo è difficile!",
+ note:"<b>Al mercatino:</b> giacca rossa, pantaloni blu, scarpe nere, sciarpa verde.<br><b>Nel sacco:</b> gonna lunga e nera, fazzoletto rosso, cappotto grigio, scarpe vecchie e rotte.",
+ qs:[{t:"type",k:"i verbi riflessivi",q:"Scrivi la frase: la Befana / vestirsi / con pantaloni blu.",a:["la befana si veste con pantaloni blu","la befana si veste con i pantaloni blu"],h1:"La Befana = lei: si + verbo. Poi: con pantaloni blu.",r:"vestirsi: si veste (lei). Frase: La Befana si veste con pantaloni blu."},
+     {t:"type",k:"quello",q:"«Quali scarpe porta al mercatino?» — Scrivi due parole: ______ ______. (quello + nero)",a:["quelle nere"],h1:"Scarpe: femminile plurale. Due parole: quelle + nere.",r:RULE_Q+" Il colore cambia come il nome: scarpe nere."},
+     {t:"mc",k:"aggettivi",q:"Quale frase sulle scarpe è corretta?",o:["Le scarpe della Befana sono vecchie e rotte.","Le scarpe della Befana è vecchie e rotte.","Le scarpe della Befana sono vecchio e rotte.","La scarpe della Befana sono vecchie e rotte."],a:0,h:["","«Le scarpe» = plurale: sono, non è.","«Vecchio» è maschile singolare. Le scarpe sono femminili plurali.","Articolo: le scarpe, non «la scarpe»."],h1:"Controlla il verbo, l’articolo e gli aggettivi.",r:"le scarpe (f. pl.) → sono · vecchie · rotte."},
+     {t:"order",k:"i verbi riflessivi",lines:["La Befana","si alza","alle otto di sera","si veste","e va al mercatino"],h1:"Chi? → che cosa fa? → quando? → poi?",r:"Ordine: La Befana → si alza → alle otto di sera → si veste → e va al mercatino."},
+     {t:"type",k:"lo/la/li/le",q:"La Befana prende i vestiti vecchi e ______ nasconde nel sacco. (lo / la / li / le)",a:["li"],h1:"I vestiti: maschile plurale.",r:RULE_P},
+     {t:"type",k:"passato prossimo",q:"La Befana ______ al mercatino alle 21:30. (andare, passato prossimo) Scrivi due parole.",a:["è andata"],h1:"Andare: essere + participio. La Befana = lei.",r:"Arrivare, andare, uscire → essere. Lei è andata · lui è andato · loro sono andati / andate."}],
+ clue:"La Befana si sveglia alle otto di sera, si veste in modo moderno e va al mercatino. I suoi vestiti vecchi sono nel sacco.",
+ help:["la Befana = lei → si alza · si veste · si sveglia","quello/quella/quelli/quelle: come il nome"]},
+23:{title:"Il motivo",story:"Nel sacco c’è anche una pagina di quaderno. Leggi la pagina. Attenzione: questo fascicolo è difficile!",
+ note:"Ogni anno tutti aspettano Babbo Natale. Io arrivo il 6 gennaio, quando i regali sono già a casa. Nessuno pensa a me! In Italia c’è un proverbio: «L’Epifania tutte le feste porta via». Quest’anno voglio portare io i regali la notte del 24 dicembre.<br><i>(Testo scritto per questa classe)</i>",
+ qs:[{t:"mc",k:"comprensione",q:"Perché è triste la Befana?",o:["Perché arriva il 6 gennaio e nessuno pensa a lei.","Perché non ha una scopa.","Perché non sa volare."],a:0,h:["","Nel testo non c’è la parola «scopa».","Nel testo non si parla di volare."],h1:"Cerca «Nessuno pensa a me».",r:"Nel testo: «Io arrivo il 6 gennaio … Nessuno pensa a me!»"},
+     {t:"mc",k:"comprensione",q:"Che cosa vuole fare la Befana quest’anno?",o:["Portare i regali la notte del 24 dicembre","Aspettare il 6 gennaio","Andare a Milano"],a:0,h:["","Il 6 gennaio è il giorno in cui arriva ogni anno.","Nel testo non c’è Milano."],h1:"Cerca «Quest’anno voglio …».",r:"Nel testo: «Quest’anno voglio portare io i regali la notte del 24 dicembre»."},
+     {t:"mc",k:"modali",q:"La Befana non ___ rapire Babbo Natale. Non è giusto!",o:["deve","devi","devono"],a:0,h:["","«Devi» = tu. La Befana = lei.","«Devono» = loro. La Befana è una persona."],h1:"La Befana = lei.",r:"dovere: devo · devi · deve · dobbiamo · dovete · devono."},
+     {t:"type",k:"i verbi riflessivi",q:"Il 6 gennaio i bambini ______ presto e ______ in fretta. (svegliarsi, vestirsi) Scrivi quattro parole.",a:["si svegliano si vestono","si svegliano e si vestono"],h1:"I bambini = loro: si … -ano / -ono.",r:"svegliarsi: si svegliano (loro) · vestirsi: si vestono (loro)."},
+     {t:"mc",k:"quello",q:"Il commesso mostra due giacche: una rossa e una verde. La Befana dice: «Voglio ___ rossa, non ___ verde!»",o:["quella / quella","quello / quella","quelle / quella"],a:0,h:["","Giacca è femminile: quella, non quello.","Giacca è singolare: quella, non quelle."],h1:"Giacca: femminile singolare. Due volte.",r:RULE_Q},
+     {t:"order",k:"comprensione",lines:["Il 30 novembre la Befana si sveglia alle otto di sera.","Si veste con una giacca rossa e va al mercatino.","Incontra Babbo Natale e lo mette nel sacco.","Poi lo nasconde dietro la bancarella 47."],h1:"Prima si sveglia, poi si veste, poi incontra Babbo Natale.",r:"Ordine: si sveglia → si veste e va al mercatino → incontra Babbo Natale → lo nasconde."}],
+ clue:"La Befana è triste: arriva solo il 6 gennaio e tutti pensano a Babbo Natale. Ha un motivo!",
+ help:["potere · volere · dovere · sapere + infinito","si sveglia · si veste · si alza (lei) · si svegliano · si vestono (loro)"]}
+};
+D[24]={title:"La soluzione",final:1,story:"Ultimo fascicolo! Metti insieme tutti gli indizi del tuo dossier. Prima fai alcuni esercizi difficili. Poi arriva la domanda finale: chi è il colpevole o la colpevole?",
+ qs:[{t:"type",k:"i verbi riflessivi",q:"Scrivi la frase: Chiara / vestirsi / in fretta.",a:["chiara si veste in fretta"],h1:"Chiara = lei: si + verbo in -e.",r:"vestirsi: mi vesto · ti vesti · si veste · ci vestiamo · vi vestite · si vestono. Il pronome sta davanti al verbo."},
+     {t:"type",k:"quello",q:"Quali pantaloni vuole il ladro / la ladra? (blu) — Rispondi con «quello».",a:["quelli blu"],h1:"Pantaloni: maschile plurale.",r:RULE_Q},
+     {t:"mc",k:"i verbi riflessivi",q:"Quale frase è corretta?",o:["Marco si sveglia alle tre e si veste subito.","Marco mi sveglia alle tre e si veste subito.","Marco si svegliano alle tre e si veste subito.","Marco si sveglia alle tre e ti veste subito."],a:0,h:["","«Mi» = io. Marco = lui: si.","«Si svegliano» = loro. Marco è una persona.","«Ti» = tu. Marco = lui: si."],h1:"Marco = lui. Controlla tutti i pronomi.",r:RULE_R},
+     {t:"order",k:"i verbi riflessivi",lines:["La Befana","si sveglia","alle otto","di sera","e si veste","in fretta"],h1:"Soggetto → verbo → ora → …",r:"Ordine: chi? (La Befana) → che cosa fa? (si sveglia) → quando? (alle otto di sera) → poi (e si veste in fretta)."},
+     {t:"type",k:"aggettivi",q:"Il contrario di «lunga» è ______ e il contrario di «grande» è ______. (due parole)",a:["corta piccola","corta e piccola","corta piccolo","corta e piccolo"],h1:"lunga ≠ ? · grande ≠ ?",r:"corta ≠ lunga · piccola ≠ grande."}],
+ clue:"La colpevole è la Befana! Babbo Natale è nella bancarella numero 47.",
+ help:["Rileggi il tuo dossier: ogni indizio ti aiuta.","Escludi i sospettati con alibi (biglietti a destra)."]};
+// Abschlussfrage: Täter/-in und drei Beweise. Beweise: ok:true = zeigt auf die Befana (fünf richtige, genau drei müssen gewählt werden).
+var FINAL={culprit:"befana",wait:20,proofs:[
+ {t:"La Befana si sveglia alle otto di sera e non dice dove va.",ok:true},
+ {t:"Il ladro / La ladra voleva una giacca molto lunga e larga.",ok:true},
+ {t:"Nella borsa del ladro / della ladra ci sono carbone dolce e caramelle.",ok:true},
+ {t:"Solo la Befana sa volare con la scopa.",ok:true},
+ {t:"Dietro il negozio c’è un sacco con vestiti vecchi: gonna, fazzoletto rosso e scarpe rotte.",ok:true},
+ {t:"La stilista Chiara porta una giacca rossa sulla passerella.",ok:false},
+ {t:"Marco è in pasticceria dalle 21:28 alle 22:10.",ok:false},
+ {t:"Luca è al giardino botanico e ha una foto con l’ora.",ok:false},
+ {t:"Il ladro / La ladra ha comprato una sciarpa verde.",ok:false},
+ {t:"Alle 21:30 Babbo Natale va al mercatino.",ok:false}]};
+// IDs und Zuordnung
+Object.keys(D).forEach(function(n){D[n].qs.forEach(function(q,i){q.id="d"+n+"q"+(i+1);q.door=+n;});});
+// ===== Zustand =====
+var S={done:{},helps:0,errs:{},fixed:{},seen:{},cross:{},win:null,test:false,day:3};
+function load(){try{var s=JSON.parse(localStorage.getItem("obn")||"{}");if(s.done)S.done=s.done;if(s.helps)S.helps=s.helps;if(s.errs)S.errs=s.errs;if(s.fixed)S.fixed=s.fixed;if(s.seen)S.seen=s.seen;if(s.cross)S.cross=s.cross;if(s.win)S.win=s.win;}catch(e){}}
+function save(){try{localStorage.setItem("obn",JSON.stringify({done:S.done,helps:S.helps,errs:S.errs,fixed:S.fixed,seen:S.seen,cross:S.cross,win:S.win}));}catch(e){}}
+function pad(n){return n<10?"0"+n:""+n}
+function today(){if(S.test)return "2026-12-"+pad(S.day);var d=new Date();return d.getFullYear()+"-"+pad(d.getMonth()+1)+"-"+pad(d.getDate());}
+function seqOk(n){return S.test||n===1||!!S.done[n-1];}
+function isOpen(n){
+ var t=today();
+ if(UNLOCK[n])return t>=UNLOCK[n]&&seqOk(n);
+ var ok=t>="2026-12-"+pad(n);
+ RELEASE.forEach(function(r){if(t>=r[0]&&n<=r[1])ok=true;});
+ return ok&&seqOk(n);
+}
+function renderPunto(){
+ var topics={},order=[];
+ Object.keys(D).forEach(function(n){if(!S.done[n])return;D[n].qs.forEach(function(q){
+  if(!(q.k in topics)){topics[q.k]=0;order.push(q.k);}
+  topics[q.k]+=S.fixed[q.id]?0:(S.errs[q.id]||0);});});
+ var el=$("punto");
+ if(!order.length){el.textContent="Risolvi il primo fascicolo: poi vedi qui i tuoi temi.";return;}
+ var h="";
+ order.forEach(function(k){var e=topics[k],c=e===0?"var(--ok)":e<3?"var(--gold)":"var(--bad)",l=e===0?"bravo / brava":e<3?"così così":"da ripetere";
+  h+='<div class="pt"><span><span class="dot" style="background:'+c+'"></span>'+k+'</span><b>'+l+'</b></div>';});
+ el.innerHTML=h+'<p class="small">Grün = bravo/a (sicher) · gelb = so lala · rot = üben. Nach «Caso riaperto» werden gelöste Fehler nicht mehr gezählt.</p>';
+}
+function $(id){return document.getElementById(id);}
+function norm(s){return s.toLowerCase().replace(/[\s€.,!?;:]|euro/g,"");}
+function shuffle(a){return a.sort(function(){return Math.random()-.5;});}
+// ===== Wörterbuch-Tooltip =====
+var tipT;
+document.addEventListener("click",function(e){var el=e.target;if(el.classList&&el.classList.contains("w")){var t=$("tip");t.textContent=el.textContent+" = "+el.getAttribute("data-t");t.hidden=false;clearTimeout(tipT);tipT=setTimeout(function(){t.hidden=true;},4500);}});
+document.addEventListener("keydown",function(e){if(e.key==="Enter"&&e.target.classList&&e.target.classList.contains("w"))e.target.click();});
+// ===== Startseite =====
+function home(){
+ $("task").hidden=true;$("home").hidden=false;
+ $("intro").innerHTML="<p>"+gl("Babbo Natale è sparito! Sei un detective o una detective e devi salvare il Natale. Ogni giorno apri un fascicolo, risolvi l’enigma e raccogli un indizio. Il 24 dicembre trovi il colpevole o la colpevole. Obiettivo: trova tutti gli indizi e salva il Natale!")+"</p>";
+ var g=$("grid");g.innerHTML="";var cnt=0;
+ for(var n=1;n<=24;n++){
+  var b=document.createElement("button");b.className="door";b.innerHTML="<small>FASCICOLO</small>"+n;
+  var open=isOpen(n)&&D[n];
+  if(S.done[n]){b.className+=" done";cnt++;}else if(open){b.className+=" open";}
+  b.disabled=!open&&!S.done[n];
+  (function(k){b.onclick=function(){openDoor(k);};})(n);
+  b.setAttribute("aria-label","Fascicolo "+n);g.appendChild(b);
+ }
+ $("pb").style.width=(cnt/24*100)+"%";$("hc").textContent=S.helps;
+ $("todayInfo").textContent="Oggi: "+today().split("-").reverse().join(".")+" · "+cnt+" / 24 indizi · Apri i fascicoli in ordine.";renderPunto();renderSusp();
+ var win=$("win");if(cnt===24){win.hidden=false;win.innerHTML='<div class="stamp">CASO RISOLTO</div><p>Hai salvato il Natale! Mostra questo schermo al tuo insegnante / alla tua insegnante.</p><p class="small">'+(S.win?S.win.d+" · "+S.win.t:today().split("-").reverse().join("."))+' · 24 / 24 indizi</p>';}else{win.hidden=true;}
+ var c="";for(var k=1;k<=24;k++){if(S.done[k]&&D[k])c+="<li><b>"+k+".</b> "+gl(D[k].clue)+"</li>";}
+ $("clues").innerHTML=c?"<ul>"+c+"</ul>":"Nessun indizio ancora.";
+}
+var SC='<div class="figs"><figure><svg width="120" height="80" viewBox="0 0 120 80" role="img" aria-label="slitta"><path d="M15 55h70l12-22H80v22" fill="none" stroke="#f2c14e" stroke-width="5" stroke-linejoin="round"/><path d="M8 68h90q12 0 12-10" fill="none" stroke="#f2c14e" stroke-width="5" stroke-linecap="round"/></svg><br>@1</figure><figure><svg width="120" height="80" viewBox="0 0 120 80" role="img" aria-label="biglietto"><rect x="25" y="12" width="70" height="50" rx="3" fill="#f4f1e8"/><path d="M25 14l35 26 35-26" fill="none" stroke="#d8434a" stroke-width="4"/></svg><br>@2</figure><figure><svg width="120" height="80" viewBox="0 0 120 80" role="img" aria-label="detective"><circle cx="50" cy="35" r="22" fill="none" stroke="#f2c14e" stroke-width="6"/><path d="M66 52l24 20" stroke="#f2c14e" stroke-width="8" stroke-linecap="round"/></svg><br>@3</figure></div>';
+function scene(){return SC.replace("@1",gl("La slitta è vuota.")).replace("@2",gl("Un biglietto sul tavolo.")).replace("@3",gl("Un detective o una detective cerca il colpevole."));}
+// ===== Notizzettel der Verdächtigen =====
+// door = ab diesem Türchen vorgestellt. Ausschließen machen die Kinder selbst per Antippen.
+var SUSP=[
+ {id:"chiara",name:"Chiara",role:"la stilista",door:8},
+ {id:"marco",name:"Marco",role:"il pasticciere",door:9},
+ {id:"luca",name:"Luca",role:"il fotografo",door:9},
+ {id:"befana",name:"La Befana",role:"la vecchia signora dei regali",door:9}];
+function avatar(id){
+ var skin={chiara:"#f3c9a5",marco:"#e8b98f",luca:"#d9a679",befana:"#f1cfae"}[id];
+ var a='<svg width="56" height="56" viewBox="0 0 64 64" role="img" aria-label="Ritratto: '+id+'"><rect width="64" height="64" rx="8" fill="#e9dfb4"/>';
+ if(id==="chiara")a+='<path d="M14 40V26a18 18 0 0 1 36 0v14l-6-6H20z" fill="#d9558a"/>';
+ if(id==="luca")a+='<path d="M18 28a14 14 0 0 1 28 0z" fill="#3b2a1a"/>';
+ a+='<circle cx="32" cy="34" r="13" fill="'+skin+'"/>';
+ if(id==="chiara")a+='<path d="M19 30a13 11 0 0 1 26 0c-6-2-18-2-26 0z" fill="#d9558a"/><rect x="22" y="48" width="20" height="5" fill="#f2c14e"/>';
+ if(id==="marco")a+='<rect x="21" y="14" width="22" height="9" fill="#fff"/><circle cx="23" cy="14" r="6" fill="#fff"/><circle cx="32" cy="11" r="7" fill="#fff"/><circle cx="41" cy="14" r="6" fill="#fff"/><path d="M26 39q6 4 12 0q-6-1-12 0z" fill="#5a3a1a"/>';
+ if(id==="luca")a+='<rect x="22" y="47" width="20" height="12" rx="2" fill="#555"/><circle cx="32" cy="53" r="4" fill="#9ad"/>';
+ if(id==="befana")a+='<path d="M17 32a15 15 0 0 1 30 0c-7-3-23-3-30 0z" fill="#c9433a"/><circle cx="32" cy="14" r="5" fill="#b9b9b9"/><path d="M18 34c0 8 3 10 3 10M46 34c0 8-3 10-3 10" stroke="#b9b9b9" stroke-width="4" fill="none"/>';
+ a+='<circle cx="27" cy="34" r="1.6" fill="#222"/><circle cx="37" cy="34" r="1.6" fill="#222"/></svg>';
+ return a;
+}
+function renderSusp(){
+ var h='<div class="tag">'+gl("I sospettati")+'</div><div class="small">'+gl("Tocca un biglietto: escludi una persona.")+'</div>';
+ SUSP.forEach(function(p,i){
+  if(S.seen[p.door]){
+   var x=S.cross[p.id];
+   h+='<button class="sn'+(x?" ex":"")+'" data-id="'+p.id+'" aria-pressed="'+(x?"true":"false")+'"><span class="pin"></span>'+avatar(p.id)+'<div><b>'+p.name+'</b><span class="r">'+p.role+'</span></div></button>';
+  }else{
+   h+='<div class="sn"><span class="pin"></span><div class="q" role="img" aria-label="Persona sconosciuta">?</div><div><b>'+gl("Persona sospetta")+' n. '+(i+1)+'</b><span class="r">'+gl("non ancora conosciuta")+'</span></div></div>';
+  }
+ });
+ $("susp").innerHTML=h;
+}
+// ===== Caso riaperto (Wiederholung aus eigenen Fehlern) =====
+function mkRev(q){var v=q.v;return {id:q.id,door:q.door,t:q.t,k:q.k,q:v.q,o:v.o,a:v.a,h:v.h||null,h1:v.h1||q.h1,r:v.r||q.r,rev:1};}
+function buildReview(cfg){
+ var all=[];
+ for(var d=1;d<=cfg.to;d++){if(D[d])D[d].qs.forEach(function(q){if(q.v)all.push(q);});}
+ var errd=all.filter(function(q){return S.errs[q.id]&&!S.fixed[q.id];}).sort(function(a,b){return S.errs[b.id]-S.errs[a.id];});
+ var pick=errd.slice(0,5);
+ if(pick.length<5){
+  var rest=shuffle(all.filter(function(q){return q.door>=cfg.from&&q.door<=cfg.to&&pick.indexOf(q)<0;}));
+  pick=pick.concat(rest.slice(0,5-pick.length));
+ }
+ var tp=[];(errd.length?errd.slice(0,5):pick).forEach(function(q){if(tp.indexOf(q.k)<0)tp.push(q.k);});
+ return {qs:pick.map(mkRev),errd:errd.length,topics:tp};
+}
+// ===== Ein Türchen spielen =====
+function openDoor(n){
+ var d=D[n],qi=0,list=d.qs,phase=0,w=0;
+ $("home").hidden=true;var t=$("task");t.hidden=false;S.seen[n]=true;save();renderSusp();
+ var h='<div class="row"><div class="tag">Fascicolo '+n+' · '+d.title+'</div><button class="btn" id="back">← Calendario</button></div><div class="card"><p>'+gl(d.story)+'</p>';
+ if(d.scene)h+=scene();
+ if(d.note)h+='<div class="note">'+gl(d.note)+'</div>';
+ if(d.photo)h+='<figure class="photo"><img src="'+d.photo.src+'" alt="'+d.photo.alt+'" width="1536" height="1024" loading="lazy">'+(d.photo.stamp?'<span class="ts" aria-hidden="true">'+d.photo.stamp+'</span>':'')+'<figcaption>Immagine: generata con IA</figcaption></figure>';
+ h+='<div id="rvh"></div><div id="q"></div><div class="msg" id="msg" aria-live="polite"></div><div id="zet"></div><button class="btn" id="hb">Aiuto</button><div id="help"></div></div>';
+ t.innerHTML=h;$("back").onclick=home;
+ var hi=0;$("hb").onclick=function(){S.helps++;save();$("help").innerHTML='<div class="help">'+d.help[hi%d.help.length]+'</div>';hi++;$("hc").textContent=S.helps;};
+ function zet(lab,txt){$("zet").innerHTML='<div class="zettel"><span class="pin"></span><div class="tag">'+lab+'</div>'+gl(txt)+'</div>';}
+ function good(q){
+  if(q.rev){S.fixed[q.id]=true;save();}
+  $("zet").innerHTML="";$("msg").textContent="Giusto! ✓";$("msg").style.color="var(--ok)";setTimeout(next,800);
+ }
+ function wrong(q,i){
+  if(!q.rev){S.errs[q.id]=(S.errs[q.id]||0)+1;save();}
+  w++;
+  $("msg").textContent="Riprova!";$("msg").style.color="var(--bad)";
+  if(w===1)zet("Piccolo aiuto",(i!=null&&q.h&&q.h[i])||q.h1||"Leggi di nuovo con attenzione.");
+  else zet("Regola",q.r||d.help[0]);
+ }
+ function ask(){
+  var q=list[qi],box=$("q");w=0;$("zet").innerHTML="";$("msg").textContent="";
+  var num="<b>"+(qi+1)+"/"+list.length+"</b> ";
+  if(q.t==="mc"){
+   box.innerHTML="<p>"+num+gl(q.q)+"</p>";
+   q.o.forEach(function(o,i){var b=document.createElement("button");b.className="opt";b.textContent=o;
+    b.onclick=function(){if(i===q.a){b.className="opt ok";good(q);}else{b.className="opt bad";b.disabled=true;wrong(q,i);}};box.appendChild(b);});
+  } else if(q.t==="type"){
+   box.innerHTML="<p>"+num+gl(q.q)+"</p><input class='ans' id='ans' autocapitalize='off' autocomplete='off' aria-label='risposta'><button class='btn solid' id='ck'>Controlla</button>";
+   $("ck").onclick=function(){var v=norm($("ans").value);if(q.a.some(function(x){return norm(x)===v;}))good(q);else wrong(q,null);};
+  } else {
+   var order=[],pool=q.lines.map(function(l,i){return i;}).sort(function(a,b){return (a*7%5)-(b*7%5)||a-b;});
+   (function draw(){
+    var s="<p>"+num+"Tocca le frasi nell’ordine giusto.</p><div class='seq'>";
+    order.forEach(function(i,k){s+="<div>"+(k+1)+". "+q.lines[i]+"</div>";});
+    box.innerHTML=s+"</div>";
+    pool.forEach(function(i){if(order.indexOf(i)<0){var b=document.createElement("button");b.className="opt";b.textContent=q.lines[i];
+     b.onclick=function(){order.push(i);if(order.length<q.lines.length){draw();return;}
+      if(order.every(function(v,k){return v===k;})){draw();good(q);}else{order=[];draw();wrong(q,null);}};box.appendChild(b);}});
+   })();
+  }
+ }
+ function finish(){
+  S.done[n]=true;save();$("q").innerHTML="";$("msg").textContent="";$("zet").innerHTML="";$("rvh").innerHTML="";
+  $("help").innerHTML='<div class="clue"><div class="tag">Indizio '+n+'</div>'+gl(d.clue)+'</div><p><button class="btn solid" id="ok">Salva nel dossier</button></p>';
+  $("ok").onclick=home;
+ }
+ function showFinal(){
+  $("zet").innerHTML="";$("msg").textContent="";$("rvh").innerHTML="";
+  var box=$("q"),locked=false,tm=null;
+  function msg(t,c){$("msg").textContent=t;$("msg").style.color=c||"var(--bad)";}
+  function lock(sec){
+   locked=true;var bs=box.querySelectorAll("button.cand");bs.forEach(function(b){b.disabled=true;});
+   var left=sec;msg("Non è corretto. Rileggi il dossier! Aspetta "+left+" secondi.");
+   clearInterval(tm);tm=setInterval(function(){left--;
+    if(!document.body.contains(box.firstChild)&&!box.querySelector("button.cand")){clearInterval(tm);return;}
+    if(left<=0){clearInterval(tm);locked=false;bs.forEach(function(b){b.disabled=b.classList.contains("bad");});msg("Riprova!");}
+    else msg("Non è corretto. Rileggi il dossier! Aspetta "+left+" secondi.");},1000);
+  }
+  function cands(){
+   box.innerHTML='<div class="rvh"><div class="tag">Domanda finale</div>'+gl("Chi è il colpevole / la colpevole? Tocca la persona.")+'</div><div id="cb"></div>';
+   SUSP.forEach(function(p){var b=document.createElement("button");b.className="opt cand";b.innerHTML=avatar(p.id)+"<span><b>"+p.name+"</b> · "+p.role+"</span>";
+    b.onclick=function(){if(locked)return;if(p.id===FINAL.culprit){clearInterval(tm);msg("");proofs();}else{b.className="opt bad cand";lock(FINAL.wait);}};
+    $("cb").appendChild(b);});
+  }
+  function proofs(){
+   var sel={},pl=FINAL.proofs,order=pl.map(function(p,i){return i;}).sort(function(a,b){return (a*5%7)-(b*5%7)||a-b;});
+   box.innerHTML='<div class="rvh"><div class="tag">Indizi</div>'+gl("Giusto! Scegli i tre indizi che provano la tua risposta.")+'</div><div id="pl"></div><button class="btn solid" id="pc">Controlla</button>';
+   order.forEach(function(i){var b=document.createElement("button");b.className="opt";b.style.display="block";b.style.textAlign="left";b.setAttribute("aria-pressed","false");b.textContent=pl[i].t;
+    b.onclick=function(){if(sel[i]){delete sel[i];b.setAttribute("aria-pressed","false");b.className="opt";}
+     else if(Object.keys(sel).length>=3){msg("Massimo tre indizi.");}
+     else{sel[i]=1;b.setAttribute("aria-pressed","true");b.className="opt ok";msg("");}};
+    $("pl").appendChild(b);});
+   $("pc").onclick=function(){var ks=Object.keys(sel);if(ks.length!==3){msg("Scegli tre indizi.");return;}
+    var good=ks.filter(function(k){return pl[k].ok;}).length;
+    if(good===3)won();else{msg(good===1?"Hai 1 indizio giusto su 3.":"Hai "+good+" indizi giusti su 3.");zet("Piccolo aiuto","Cerca gli indizi che parlano della persona giusta, non delle altre.");}};
+  }
+  function won(){
+   S.done[n]=true;var dt=new Date(),hh=pad(dt.getHours())+":"+pad(dt.getMinutes());
+   S.win={d:today().split("-").reverse().join("."),t:hh};save();
+   $("zet").innerHTML="";$("msg").textContent="";
+   box.innerHTML='<div class="bigwin"><div class="stamp">CASO RISOLTO</div><p>'+gl("La colpevole è la Befana! Babbo Natale è libero e il Natale è salvo.")+'</p><p>'+gl("Mostra questo schermo al tuo insegnante / alla tua insegnante.")+'</p><p class="small">'+S.win.d+" · "+S.win.t+' · 24 / 24 indizi</p><button class="btn solid" id="ok">Calendario</button></div>';
+   $("ok").onclick=home;
+  }
+  cands();
+ }
+ function next(){
+  qi++;if(qi<list.length){ask();return;}
+  if(d.review&&!phase){
+   phase=1;var rv=buildReview(d.review);
+   if(rv.qs.length){
+    list=rv.qs;qi=0;
+    $("rvh").innerHTML='<div class="rvh"><div class="tag">Caso riaperto</div>'+gl(rv.errd?("Controlla di nuovo i punti difficili: "+rv.topics.join(", ")+"."):"Un ultimo controllo con esercizi nuovi, prima della verifica.")+"</div>";
+    ask();return;
+   }
+  }
+  if(d.final){showFinal();return;}
+  finish();
+ }
+ ask();
+}
+// ===== Start =====
+(function init(){
+ load();
+ var sn=$("snow");for(var i=0;i<28;i++){var f=document.createElement("i");f.style.left=(i*3.6+Math.random()*3)+"%";f.style.animationDuration=(9+Math.random()*10)+"s";f.style.animationDelay=(-Math.random()*15)+"s";f.style.width=f.style.height=(3+Math.random()*5)+"px";sn.appendChild(f);}
+ var sel=$("td");for(var k=1;k<=24;k++){var o=document.createElement("option");o.value=k;o.textContent=k+" dicembre";if(k===3)o.selected=true;sel.appendChild(o);}
+ $("tm").onchange=function(){S.test=this.checked;$("tmsel").hidden=!this.checked;home();};
+ sel.onchange=function(){S.day=+this.value;home();};
+ var rb=$("rst"),armed=false;
+ rb.onclick=function(){if(!armed){armed=true;rb.textContent="Sicher? Nochmal tippen";setTimeout(function(){armed=false;rb.textContent="Fortschritt dieses Geräts löschen";},4000);return;}
+  S.done={};S.errs={};S.fixed={};S.seen={};S.cross={};S.win=null;S.helps=0;save();armed=false;rb.textContent="Fortschritt dieses Geräts löschen";home();};
+ var au=$("au"),on=false;
+ au.onerror=function(){$("mus").textContent="♪ (Datei fehlt)";};
+ $("mus").onclick=function(){if(on){au.pause();on=false;this.textContent="♪ Musica";}else{var p=au.play();if(p&&p.then){p.then(function(){on=true;$("mus").textContent="♪ Musica: on";}).catch(function(){$("mus").textContent="♪ (Datei fehlt)";});}}};
+ function tc(){$("testcard").hidden=location.hash!=="#prova";}
+ window.addEventListener("hashchange",tc);tc();
+ $("susp").addEventListener("click",function(e){var b=e.target.closest&&e.target.closest("button.sn");if(!b)return;var id=b.getAttribute("data-id");S.cross[id]=!S.cross[id];save();renderSusp();});
+ home();
+})();
+</script>
+</body>
+</html>
